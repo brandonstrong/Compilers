@@ -13,64 +13,68 @@ print("Compilers are neat.")
 #      Set up lex
 ##########################################
 
-
-# ------------------------------------------------------------
-# calclex.py
-#
-# tokenizer for a simple expression evaluator for
-# numbers and +,-,*,/
-# ------------------------------------------------------------
-
 # List of token names.   This is always required
 tokens = (
-    'NUMBER',
-    'PLUS',
-    'MINUS',
-    'TIMES',
-    'DIVIDE',
-    'LPAREN',
-    'RPAREN',
-    'SPACE',
-    'CHAR'
+    'INTLITERAL',
+    'FLOATLITERAL',
+    'STRINGLITERAL',
+    'COMMENT',
+    'KEYWORDS',
+    'OPERATORS'
 )
 
-# Regular expression rules for simple tokens
-t_PLUS = r'\+'
-t_MINUS = r'-'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
+def printToken(TNAME, TVAL):
+    print("NEW TOKEN(" + TNAME + "," + TVAL +")")
 
+##########################################
+#      Matt do these two
+##########################################
 
-# A regular expression rule for space
-def t_SPACE(t):
-    r'\s'
-    t.value = " "
-    return t
+# Definition for int literal
+def t_INTLITERAL(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("INTLITERAL", t.value)
 
-def t_CHAR(t):
-    r'\d\W'
-    return t
+# Definition for float literal
+def t_FLOATLITERAL(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("STRINGLITERAL", t.value)
 
-# A regular expression rule with some action code
-def t_NUMBER(t):
-    r'\d+'
-    t.value = int(t.value)
-    return t
+##########################################
+#      Sawyer do these two
+##########################################
 
+# Definition for string literal
+def t_STRINGLITERAL(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("STRINGLITERAL", t.value)
 
-# Define a rule so we can track line numbers
-def t_newline(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
+# Definition for comment
+def t_COMMENT(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("COMMENT", t.value)
 
+##########################################
+#      Brandon do these two
+##########################################
 
-# A string containing ignored characters (spaces and tabs)
-t_ignore = ' \t'
+# Definition for keywords
+def t_KEYWORDS(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("KEYWORDS", t.value)
 
+# Definition for float literal
+def t_OPERATORS(t):
+    # Fill in this regex (copy and paste from regex101
+    r'\s\w\d'
+    printToken("OPERATORS", t.value)
 
-# Error handling rule
+# Error handling rule, This will tell us when an invalid token is found.
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
@@ -85,7 +89,7 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-INT i = 5*8) + (4*6)
+Test Str. Change L8R
 '''
 
 # Give the lexer some input
