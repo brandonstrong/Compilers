@@ -15,8 +15,8 @@ print("Compilers are neat.")
 
 # List of token names.   This is always required
 tokens = (
-    'INTLITERAL',
     'FLOATLITERAL',
+    'INTLITERAL',
     'STRINGLITERAL',
     'COMMENT',
     'KEYWORDS',
@@ -30,17 +30,17 @@ def printToken(TNAME, TVAL):
 #      Matt do these two
 ##########################################
 
-# Definition for int literal
-def t_INTLITERAL(t):
-    # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
-    printToken("INTLITERAL", t.value)
-
 # Definition for float literal
 def t_FLOATLITERAL(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
-    printToken("STRINGLITERAL", t.value)
+    r'(\d+\.\d+)'
+    printToken("FLOATLITERAL", t.value)
+
+# Definition for int literal
+def t_INTLITERAL(t):
+    # Fill in this regex (copy and paste from regex101
+    r'(\d+)'
+    printToken("INTLITERAL", t.value)
 
 ##########################################
 #      Sawyer do these two
@@ -49,13 +49,13 @@ def t_FLOATLITERAL(t):
 # Definition for string literal
 def t_STRINGLITERAL(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
+    r'\s'
     printToken("STRINGLITERAL", t.value)
 
 # Definition for comment
 def t_COMMENT(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
+    r'\s'
     printToken("COMMENT", t.value)
 
 ##########################################
@@ -65,13 +65,13 @@ def t_COMMENT(t):
 # Definition for keywords
 def t_KEYWORDS(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
+    r'(PROGRAM)|(BEGIN)|(END)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)'
     printToken("KEYWORDS", t.value)
 
 # Definition for float literal
 def t_OPERATORS(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s\w\d'
+    r'\s'
     printToken("OPERATORS", t.value)
 
 # Error handling rule, This will tell us when an invalid token is found.
@@ -89,7 +89,42 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-Test Str. Change L8R
+PROGRAM fibonacci
+BEGIN
+    INT stuff = dsfa12345asdfa;
+    FLOAT flo = sdf123.4456asdf
+	STRING inputs := "Please input an integer number: ";
+	STRING space := " ";
+	STRING eol := "\n";
+
+	FUNCTION INT F (INT n)
+	BEGIN
+
+		IF (n > 2)
+		     RETURN F(n-1)+F(n-2);
+		ELSE
+			RETURN 1;
+	    ENDIF
+	END
+
+
+	FUNCTION VOID main ()
+	BEGIN
+		INT i, end, result;
+		WRITE(input);
+		READ(end);
+
+	i := 0;
+	WHILE (i != end)
+		result := F(i);
+		WRITE (i,space);
+		WRITE (result,eol);
+		i := i + 1;
+	ENDWHILE
+
+	END
+
+END
 '''
 
 # Give the lexer some input
