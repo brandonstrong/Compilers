@@ -26,7 +26,7 @@ tokens = (
 )
 
 def printToken(TNAME, TVAL):
-    print("NEW TOKEN(" + TNAME + ",'" + TVAL +"')")
+    print("Token Type: " + TNAME + "\nValue: " + TVAL)
 
 # Definition for float literal
 def t_FLOATLITERAL(t):
