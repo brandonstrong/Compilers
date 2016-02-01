@@ -55,7 +55,7 @@ def t_STRINGLITERAL(t):
 # Definition for comment
 def t_COMMENT(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s'
+    r'(--(.*))'
     printToken("COMMENT", t.value)
 
 ##########################################
@@ -91,6 +91,7 @@ lexer = lex.lex()
 data = '''
 PROGRAM fibonacci
 BEGIN
+    -- test 11
     INT stuff = dsfa12345asdfa;
     FLOAT flo = sdf123.4456asdf
 	STRING inputs := "Please input an integer number: ";
@@ -106,6 +107,7 @@ BEGIN
 			RETURN 1;
 	    ENDIF
 	END
+    -- testing theiss flkja 2 342235 532.33
 
 
 	FUNCTION VOID main ()
