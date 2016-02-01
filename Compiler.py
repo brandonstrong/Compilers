@@ -20,65 +20,58 @@ tokens = (
     'STRINGLITERAL',
     'COMMENT',
     'KEYWORDS',
-    'OPERATORS'
+    'OPERATORS',
+    'SPACE',
+    "IDENTIFIER"
 )
 
 def printToken(TNAME, TVAL):
-    print("NEW TOKEN(" + TNAME + "," + TVAL +")")
-
-##########################################
-#      Matt do these two
-##########################################
+    print("NEW TOKEN(" + TNAME + ",'" + TVAL +"')")
 
 # Definition for float literal
 def t_FLOATLITERAL(t):
-    # Fill in this regex (copy and paste from regex101
     r'(\d+\.\d+)'
     printToken("FLOATLITERAL", t.value)
 
 # Definition for int literal
 def t_INTLITERAL(t):
-    # Fill in this regex (copy and paste from regex101
     r'(\d+)'
     printToken("INTLITERAL", t.value)
 
-##########################################
-#      Sawyer do these two
-##########################################
-
 # Definition for string literal
 def t_STRINGLITERAL(t):
-    # Fill in this regex (copy and paste from regex101
-    r'\s'
+    r'"[^"]+"'
     printToken("STRINGLITERAL", t.value)
 
 # Definition for comment
 def t_COMMENT(t):
-    # Fill in this regex (copy and paste from regex101
-    r'(--(.*))'
+    r'--.*'
     printToken("COMMENT", t.value)
-
-##########################################
-#      Brandon do these two
-##########################################
 
 # Definition for keywords
 def t_KEYWORDS(t):
-    # Fill in this regex (copy and paste from regex101
     r'(PROGRAM)|(BEGIN)|(END)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)'
     printToken("KEYWORDS", t.value)
 
 # Definition for float literal
 def t_OPERATORS(t):
-    # Fill in this regex (copy and paste from regex101
     r'(:=)|(!=)|(<=)|(>=)|(>)|(<)|(\+)|(-)|(\*)|(\/)|(=)|(\()|(\))|(;)|(,)'
     printToken("OPERATORS", t.value)
+# Handle spaces
+def t_SPACE(t):
+    r'\s'
+    # Do nothing with spaces.
+
+# Definition for variables
+def t_IDENTIFIER(t):
+    r'\w+'
+    printToken("IDENTIFIER", t.value)
+
 
 # Error handling rule, This will tell us when an invalid token is found.
 def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
-
 
 # Build the lexer
 lexer = lex.lex()
