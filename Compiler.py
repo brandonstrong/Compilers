@@ -71,7 +71,7 @@ def t_KEYWORDS(t):
 # Definition for float literal
 def t_OPERATORS(t):
     # Fill in this regex (copy and paste from regex101
-    r'\s'
+    r'(:=)|(!=)|(<=)|(>=)|(>)|(<)|(\+)|(-)|(\*)|(\/)|(=)|(\()|(\))|(;)|(,)'
     printToken("OPERATORS", t.value)
 
 # Error handling rule, This will tell us when an invalid token is found.
