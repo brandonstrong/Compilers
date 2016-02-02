@@ -40,7 +40,7 @@ def t_INTLITERAL(t):
 
 # Definition for string literal
 def t_STRINGLITERAL(t):
-    r'"[^"]+"'
+    r'"[\\n]+"|"[ ]"|"[^"]+"'
     printToken("STRINGLITERAL", t.value)
 
 # Definition for comment
@@ -51,12 +51,12 @@ def t_COMMENT(t):
 # Definition for keywords
 def t_KEYWORDS(t):
     r'(PROGRAM)|(BEGIN)|(END)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)'
-    printToken("KEYWORDS", t.value)
+    printToken("KEYWORD", t.value)
 
 # Definition for float literal
 def t_OPERATORS(t):
     r'(:=)|(!=)|(<=)|(>=)|(>)|(<)|(\+)|(-)|(\*)|(\/)|(=)|(\()|(\))|(;)|(,)'
-    printToken("OPERATORS", t.value)
+    printToken("OPERATOR", t.value)
 # Handle spaces
 def t_SPACE(t):
     r'\s'
@@ -84,10 +84,8 @@ lexer = lex.lex()
 data = '''
 PROGRAM fibonacci
 BEGIN
-    -- test 11
-    INT stuff = dsfa12345asdfa;
-    FLOAT flo = sdf123.4456asdf
-	STRING inputs := "Please input an integer number: ";
+
+	STRING input := "Please input an integer number: ";
 	STRING space := " ";
 	STRING eol := "\n";
 
@@ -100,7 +98,6 @@ BEGIN
 			RETURN 1;
 	    ENDIF
 	END
-    -- testing theiss flkja 2 342235 532.33
 
 
 	FUNCTION VOID main ()
