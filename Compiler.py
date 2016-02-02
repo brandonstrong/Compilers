@@ -26,7 +26,7 @@ tokens = (
 )
 
 def printToken(TNAME, TVAL):
-    print("Token Type: " + TNAME + "\nValue: " + TVAL)
+    print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
 
 # Definition for float literal
 def t_FLOATLITERAL(t):
@@ -40,7 +40,7 @@ def t_INTLITERAL(t):
 
 # Definition for string literal
 def t_STRINGLITERAL(t):
-    r'"[\\n]+"|"[ ]"|"[^"]+"'
+    r'"[^"]+"'
     printToken("STRINGLITERAL", t.value)
 
 # Definition for comment
@@ -82,40 +82,38 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-PROGRAM fibonacci
+PROGRAM loop
 BEGIN
 
-	STRING input := "Please input an integer number: ";
-	STRING space := " ";
-	STRING eol := "\n";
+     STRING guess := "Guess a number: ";
+     STRING correct := "Correct!\n";
+     STRING wrong := "Wrong!\n";
+     STRING out1 := "It took you ";
+     STRING out2 := " guesses";
 
-	FUNCTION INT F (INT n)
+	INT i;
+	INT j;
+
+	--PROTO VOID main();
+
+	FUNCTION VOID main()
 	BEGIN
+		i := 17;
+		j := 0;
+		k := 0;
+		WHILE (i != j)
+			WRITE(guess);
+			READ(j);
+			k := k + 1;
+			IF (i = j)
+			     WRITE(correct);
+			ELSE
+			     WRITE(wrong);
+			ENDIF
+		ENDWHILE
 
-		IF (n > 2)
-		     RETURN F(n-1)+F(n-2);
-		ELSE
-			RETURN 1;
-	    ENDIF
+		WRITE (out1, k, out2);
 	END
-
-
-	FUNCTION VOID main ()
-	BEGIN
-		INT i, end, result;
-		WRITE(input);
-		READ(end);
-
-	i := 0;
-	WHILE (i != end)
-		result := F(i);
-		WRITE (i,space);
-		WRITE (result,eol);
-		i := i + 1;
-	ENDWHILE
-
-	END
-
 END
 '''
 
