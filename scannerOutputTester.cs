@@ -14,8 +14,12 @@ namespace ConsoleTester
         {
             try
             {
-                StreamReader ourStream = new StreamReader(@"C:\Users\Brandons\Desktop\our_outputs\loop.txt");
-                StreamReader theirStream = new StreamReader(@"C:\Users\Brandons\Desktop\outputs\loop.txt");
+                //string file = "fibonacci";
+                //string file = "loop";
+                //string file = "nested";
+                string file = "sqrt";
+                StreamReader ourStream = new StreamReader(@"C:\Users\" + Environment.UserName + @"\Desktop\step1\our_outputs\" + file + ".txt");
+                StreamReader theirStream = new StreamReader(@"C:\Users\" + Environment.UserName + @"\Desktop\step1\outputs\" + file + ".txt");
 
                 string ourLine = "";
                 string theirLine = "";
@@ -42,7 +46,7 @@ namespace ConsoleTester
             }
 
             Console.WriteLine("Press escape to exit");
-            while (Console.ReadKey().Key != ConsoleKey.Enter) ;
+            while (Console.ReadKey().Key != ConsoleKey.Escape) ;
         }
     }
     
