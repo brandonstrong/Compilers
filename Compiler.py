@@ -1,5 +1,6 @@
 import ply.lex as lex
 import ply.yacc as yacc
+import sys, getopt
 
 ##########################################
 #      Pre-amble...
@@ -8,6 +9,12 @@ import ply.yacc as yacc
 # Welcome to our compiler - python style
 print("Group 0 - Sawyer Payne, Matthew Gannon, Brandon Strong")
 print("Compilers are neat.")
+
+##########################################
+#      Set up inputs
+##########################################
+inputfile = ''
+outputfile = ''
 
 ##########################################
 #      Set up lex
