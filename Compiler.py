@@ -88,43 +88,6 @@ lexer = lex.lex()
 #      Test out lexer
 ##########################################
 
-# Test it out
-data = '''
-PROGRAM sqrt
-BEGIN
-
-	STRING dummy := "abcde";  --This is dummy to satisfy the grammar
-
-	FLOAT n;
-	FLOAT x1,x2;
-	FLOAT fx, dfx;
-	FLOAT error;
-	INT i;
-
-	FUNCTION VOID main()
-	BEGIN
-		error := 0.001;
-		READ (x1);
-		fx := x1*x1 - n;
-		dfx := 2.0*x1;
-		x2 := x1 - fx/dfx;
-
-		x1 := x2;
-		fx := x1*x1 - n;
-		dfx := 2.0*x1;
-		x2 := x1 - fx/dfx;
-		WHILE ((x1 - x2) > error)
-			x1 := x2;
-			fx := x1*x1 - n;
-			dfx := 2.0*x1;
-			x2 := x1 - fx/dfx;
-		ENDWHILE
-
-		WRITE (x2);
-	END
-END
-'''
-
 # Give the lexer some input
 lexer.input(string)
 
