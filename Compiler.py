@@ -53,7 +53,6 @@ def t_STRINGLITERAL(t):
 # Definition for comment
 def t_COMMENT(t):
     r'--.*'
-    printToken("COMMENT", t.value)
 
 # Definition for keywords
 def t_KEYWORDS(t):
@@ -89,37 +88,37 @@ lexer = lex.lex()
 
 # Test it out
 data = '''
-PROGRAM loop
+PROGRAM sqrt
 BEGIN
 
-     STRING guess := "Guess a number: ";
-     STRING correct := "Correct!\n";
-     STRING wrong := "Wrong!\n";
-     STRING out1 := "It took you ";
-     STRING out2 := " guesses";
+	STRING dummy := "abcde";  --This is dummy to satisfy the grammar
 
+	FLOAT n;
+	FLOAT x1,x2;
+	FLOAT fx, dfx;
+	FLOAT error;
 	INT i;
-	INT j;
-
-	--PROTO VOID main();
 
 	FUNCTION VOID main()
 	BEGIN
-		i := 17;
-		j := 0;
-		k := 0;
-		WHILE (i != j)
-			WRITE(guess);
-			READ(j);
-			k := k + 1;
-			IF (i = j)
-			     WRITE(correct);
-			ELSE
-			     WRITE(wrong);
-			ENDIF
+		error := 0.001;
+		READ (x1);
+		fx := x1*x1 - n;
+		dfx := 2.0*x1;
+		x2 := x1 - fx/dfx;
+
+		x1 := x2;
+		fx := x1*x1 - n;
+		dfx := 2.0*x1;
+		x2 := x1 - fx/dfx;
+		WHILE ((x1 - x2) > error)
+			x1 := x2;
+			fx := x1*x1 - n;
+			dfx := 2.0*x1;
+			x2 := x1 - fx/dfx;
 		ENDWHILE
 
-		WRITE (out1, k, out2);
+		WRITE (x2);
 	END
 END
 '''
