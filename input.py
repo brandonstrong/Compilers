@@ -1,4 +1,3 @@
-from optparse import OptionParser
 import sys
 
 filename = sys.argv[1]

@@ -13,8 +13,10 @@ print("Compilers are neat.")
 ##########################################
 #      Set up inputs
 ##########################################
-inputfile = ''
-outputfile = ''
+filename = sys.argv[1]
+
+f = open(filename,"r")
+string = f.read()
 
 ##########################################
 #      Set up lex
@@ -124,7 +126,7 @@ END
 '''
 
 # Give the lexer some input
-lexer.input(data)
+lexer.input(string)
 
 # Tokenize
 while True:
