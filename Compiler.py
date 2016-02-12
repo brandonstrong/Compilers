@@ -3,18 +3,20 @@ import ply.yacc as yacc
 import sys, getopt
 
 ##########################################
-#      Pre-amble...
+#  CSCI-468 Compiler
+#  Group 0 - Brandon Strong, Sawyer Payne,
+#  and Matthew Gannon
+#  Project 1 - Create a scanner which will
+#  create tokens from the Little language
+#  to pass to the parser.
+#
 ##########################################
 
-# Welcome to our compiler - python style
-print("Group 0 - Sawyer Payne, Matthew Gannon, Brandon Strong")
-print("Compilers are neat.")
 
 ##########################################
 #      Set up inputs
 ##########################################
 filename = sys.argv[1]
-
 f = open(filename,"r")
 string = f.read()
 
@@ -61,7 +63,7 @@ def t_COMMENT(t):
 
 # Definition for keywords
 def t_KEYWORDS(t):
-    r'(PROGRAM)|(BEGIN)|(END)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)'
+    r'(PROGRAM)|(BEGIN)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)|(END)'
     printToken("KEYWORD", t.value)
 
 # Definition for float literal
