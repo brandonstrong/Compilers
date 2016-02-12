@@ -18,6 +18,7 @@ filename = sys.argv[1]
 f = open(filename,"r")
 string = f.read()
 
+
 ##########################################
 #      Set up lex
 ##########################################
@@ -41,11 +42,13 @@ def printToken(TNAME, TVAL):
 def t_FLOATLITERAL(t):
     r'(\d+\.\d+)'
     printToken("FLOATLITERAL", t.value)
+    return t
 
 # Definition for int literal
 def t_INTLITERAL(t):
     r'(\d+)'
     printToken("INTLITERAL", t.value)
+    return t
 
 # Definition for string literal
 def t_STRINGLITERAL(t):
