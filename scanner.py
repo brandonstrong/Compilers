@@ -2,6 +2,7 @@ import ply.lex as lex
 import ply.yacc as yacc
 import sys, getopt
 
+
 ##########################################
 #  CSCI-468 Compiler
 #  Group 0 - Brandon Strong, Sawyer Payne,
@@ -16,10 +17,46 @@ import sys, getopt
 ##########################################
 #      Set up inputs
 ##########################################
-filename = sys.argv[1]
-f = open(filename,"r")
-string = f.read()
+#filename = sys.argv[1]
+#f = open(filename,"r")
+#data = f.read()
+data = '''
+PROGRAM fibonacci
+BEGIN
 
+	STRING input := "Please input an integer number: ";
+	STRING space := " ";
+	STRING eol := "\n";
+
+	FUNCTION INT F (INT n)
+	BEGIN
+
+		IF (n > 2)
+		     RETURN F(n-1)+F(n-2);
+		ELSE
+			RETURN 1;
+	    ENDIF
+	END
+
+
+	FUNCTION VOID main ()
+	BEGIN
+		INT i, end, result;
+		WRITE(input);
+		READ(end);
+
+	i := 0;
+	WHILE (i != end)
+		result := F(i);
+		WRITE (i,space);
+		WRITE (result,eol);
+		i := i + 1;
+	ENDWHILE
+
+	END
+
+END
+'''
 
 ##########################################
 #      Set up lex
@@ -56,20 +93,25 @@ def t_INTLITERAL(t):
 def t_STRINGLITERAL(t):
     r'"[^"]+"'
     printToken("STRINGLITERAL", t.value)
+    return t
 
 # Definition for comment
 def t_COMMENT(t):
     r'--.*'
+    # Do nothing with spaces.
 
 # Definition for keywords
 def t_KEYWORDS(t):
     r'(PROGRAM)|(BEGIN)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)|(END)'
     printToken("KEYWORD", t.value)
+    return t
 
 # Definition for float literal
 def t_OPERATORS(t):
     r'(:=)|(!=)|(<=)|(>=)|(>)|(<)|(\+)|(-)|(\*)|(\/)|(=)|(\()|(\))|(;)|(,)'
     printToken("OPERATOR", t.value)
+    return t
+
 # Handle spaces
 def t_SPACE(t):
     r'\s'
@@ -79,7 +121,7 @@ def t_SPACE(t):
 def t_IDENTIFIER(t):
     r'\w+'
     printToken("IDENTIFIER", t.value)
-
+    return t
 
 # Error handling rule, This will tell us when an invalid token is found.
 def t_error(t):
@@ -94,7 +136,7 @@ lexer = lex.lex()
 ##########################################
 
 # Give the lexer some input
-lexer.input(string)
+lexer.input(data)
 
 # Tokenize
 while True:
