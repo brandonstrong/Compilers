@@ -469,7 +469,13 @@
       <option name="project" value="LOCAL" />
       <updated>1455922844036</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Added while grammar rules">
+      <created>1455922984046</created>
+      <option name="number" value="00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1455922984046</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TestHistory">
