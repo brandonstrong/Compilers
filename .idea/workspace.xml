@@ -42,8 +42,8 @@
       <file leaf-file-name="parser.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/parser.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.013392857">
-              <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.3549107">
+              <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -451,7 +451,13 @@
       <option name="project" value="LOCAL" />
       <updated>1455920432064</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Global string, Variable declaration, Function parameter, Function declarations, and Statement list added to parser">
+      <created>1455922704997</created>
+      <option name="number" value="00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1455922704997</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -520,7 +526,8 @@
     <MESSAGE value="Parser added" />
     <MESSAGE value="Parser built up some more. Data variable needs to be reset in scanner later" />
     <MESSAGE value="Ready for the rest of the parser" />
-    <option name="LAST_COMMIT_MESSAGE" value="Ready for the rest of the parser" />
+    <MESSAGE value="Global string, Variable declaration, Function parameter, Function declarations, and Statement list added to parser" />
+    <option name="LAST_COMMIT_MESSAGE" value="Global string, Variable declaration, Function parameter, Function declarations, and Statement list added to parser" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -933,8 +940,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/parser.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.013392857">
-          <caret line="86" column="0" selection-start-line="86" selection-start-column="0" selection-end-line="86" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.3549107">
+          <caret line="92" column="0" selection-start-line="92" selection-start-column="0" selection-end-line="92" selection-end-column="0" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

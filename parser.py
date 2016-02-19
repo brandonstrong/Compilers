@@ -91,6 +91,11 @@ def p_statements_base_stmt(p):
     | write_stmt
     | return_stmt'''
 
+# While statements
+
+def p_whilestatements_while_stmt(p):
+    'while_stmt : KEYWORDS ( cond ) decl stmt_list KEYWORDS'
+
 #Error handling
 
 def p_error(p):
