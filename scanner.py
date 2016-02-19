@@ -1,5 +1,4 @@
 import ply.lex as lex
-import ply.yacc as yacc
 import sys, getopt
 
 
@@ -75,7 +74,8 @@ tokens = (
 )
 
 def printToken(TNAME, TVAL):
-    print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
+    i = 0
+    #print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
 
 # Definition for float literal
 def t_FLOATLITERAL(t):
@@ -131,13 +131,13 @@ def t_error(t):
 # Build the lexer
 lexer = lex.lex()
 
+
 ##########################################
 #      Test out lexer
 ##########################################
 
 # Give the lexer some input
 lexer.input(data)
-
 # Tokenize
 while True:
     tok = lexer.token()
