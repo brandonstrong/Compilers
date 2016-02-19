@@ -1,0 +1,44 @@
+Created by PLY version 3.8 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    INTLITERAL
+    SPACE
+    OPERATORS
+    FLOATLITERAL
+    COMMENT
+    STRINGLITERAL
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> KEYWORDS id KEYWORDS pgm_body KEYWORDS
+Rule 2     id -> IDENTIFIER
+Rule 3     pgm_body -> func_declarations
+Rule 4     decl -> string_decl decl
+Rule 5     decl -> var_decl
+Rule 6     decl -> empty
+
+Terminals, with rules where they appear
+
+COMMENT              : 
+FLOATLITERAL         : 
+IDENTIFIER           : 2
+INTLITERAL           : 
+KEYWORDS             : 1 1 1
+OPERATORS            : 
+SPACE                : 
+STRINGLITERAL        : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+decl                 : 4
+empty                : 6
+func_declarations    : 3
+id                   : 1
+pgm_body             : 1
+program              : 0
+string_decl          : 4
+var_decl             : 5
+

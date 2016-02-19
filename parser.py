@@ -6,14 +6,15 @@ from Tools.scripts.treesync import raw_input
 
 from scanner import tokens
 
-def p_program_program(p):
-    'program : PROGRAM id BEGIN pgm_body END'
 
-def p_program_id(p):
+def p_program_program(p):
+    'program : KEYWORDS id KEYWORDS pgm_body KEYWORDS'
+
+def p_program_idea(p):
     'id : IDENTIFIER'
 
 def p_program_pgm_body(p):
-    'decl : func_declarations'
+    'pgm_body : func_declarations'
 
 def p_program_decl(p):
     '''decl : string_decl decl
