@@ -1,5 +1,4 @@
 import ply.yacc as yacc
-import ply.lex as lex
 from scanner import tokens
 import sys
 
@@ -181,6 +180,9 @@ def p_empty(p):
 
 def p_error(p):
     print('Syntax error in input!')
+
+# Build parser
+parser = yacc.yacc()
 
 while True:
     try:
