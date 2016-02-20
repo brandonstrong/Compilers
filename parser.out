@@ -2,12 +2,8 @@ Created by PLY version 3.8 (http://www.dabeaz.com/ply)
 
 Unused terminals:
 
-    INTLITERAL
     SPACE
-    OPERATORS
-    FLOATLITERAL
     COMMENT
-    STRINGLITERAL
 
 Grammar
 
@@ -18,27 +14,1580 @@ Rule 3     pgm_body -> func_declarations
 Rule 4     decl -> string_decl decl
 Rule 5     decl -> var_decl
 Rule 6     decl -> empty
+Rule 7     string_decl -> KEYWORDS id OPERATORS str
+Rule 8     str -> STRINGLITERAL
+Rule 9     var_decl -> var_type id_list
+Rule 10    var_type -> KEYWORDS
+Rule 11    any_type -> var_type
+Rule 12    any_type -> KEYWORDS
+Rule 13    id_list -> id id_tail
+Rule 14    id_tail -> id id_tail
+Rule 15    id_tail -> empty
+Rule 16    param_decl_list -> param_decl param_decl_tail
+Rule 17    param_decl_list -> empty
+Rule 18    param_decl -> var_type id
+Rule 19    param_decl_tail -> param_decl param_decl_tail
+Rule 20    param_decl_tail -> empty
+Rule 21    func_declarations -> func_decl func_declarations
+Rule 22    func_declarations -> empty
+Rule 23    func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+Rule 24    func_body -> decl stmt_list
+Rule 25    stmt_list -> stmt stmt_list
+Rule 26    stmt_list -> empty
+Rule 27    stmt -> base_stmt
+Rule 28    stmt -> if_stmt
+Rule 29    stmt -> while_stmt
+Rule 30    base_stmt -> assign_stmt
+Rule 31    base_stmt -> read_stmt
+Rule 32    base_stmt -> write_stmt
+Rule 33    base_stmt -> return_stmt
+Rule 34    assign_stmt -> assign_expr
+Rule 35    assign_expr -> id OPERATORS expr
+Rule 36    read_stmt -> KEYWORDS OPERATORS id_list OPERATORS
+Rule 37    write_stmt -> KEYWORDS OPERATORS id_list OPERATORS
+Rule 38    return_stmt -> KEYWORDS expr
+Rule 39    expr -> expr_prefix factor
+Rule 40    expr_prefix -> expr_prefix factor addop
+Rule 41    expr_prefix -> empty
+Rule 42    factor -> factor_prefix postfix_expr
+Rule 43    factor_prefix -> factor_prefix postfix_expr mulop
+Rule 44    factor_prefix -> empty
+Rule 45    postfix_expr -> primary
+Rule 46    postfix_expr -> call_expr
+Rule 47    call_expr -> id OPERATORS expr_list OPERATORS
+Rule 48    expr_list -> expr expr_list_tail
+Rule 49    expr_list -> empty
+Rule 50    expr_list_tail -> OPERATORS OPERATORS expr expr_list_tail
+Rule 51    expr_list_tail -> empty
+Rule 52    primary -> OPERATORS expr OPERATORS
+Rule 53    primary -> id
+Rule 54    primary -> INTLITERAL
+Rule 55    primary -> FLOATLITERAL
+Rule 56    addop -> OPERATORS OPERATORS
+Rule 57    addop -> OPERATORS
+Rule 58    mulop -> OPERATORS OPERATORS
+Rule 59    mulop -> OPERATORS
+Rule 60    if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+Rule 61    else_part -> KEYWORDS decl stmt_list
+Rule 62    else_part -> empty
+Rule 63    cond -> KEYWORDS decl stmt_list
+Rule 64    cond -> empty
+Rule 65    while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+Rule 66    empty -> <empty>
 
 Terminals, with rules where they appear
 
 COMMENT              : 
-FLOATLITERAL         : 
+FLOATLITERAL         : 55
 IDENTIFIER           : 2
-INTLITERAL           : 
-KEYWORDS             : 1 1 1
-OPERATORS            : 
+INTLITERAL           : 54
+KEYWORDS             : 1 1 1 7 10 12 23 23 23 36 37 38 60 60 61 63 65 65
+OPERATORS            : 7 23 23 35 36 36 37 37 47 47 50 50 52 52 56 56 57 58 58 59 60 60 65 65
 SPACE                : 
-STRINGLITERAL        : 
+STRINGLITERAL        : 8
 error                : 
 
 Nonterminals, with rules where they appear
 
-decl                 : 4
-empty                : 6
-func_declarations    : 3
-id                   : 1
+addop                : 40
+any_type             : 23
+assign_expr          : 34
+assign_stmt          : 30
+base_stmt            : 27
+call_expr            : 46
+cond                 : 60 65
+decl                 : 4 24 60 61 63 65
+else_part            : 60
+empty                : 6 15 17 20 22 26 41 44 49 51 62 64
+expr                 : 35 38 48 50 52
+expr_list            : 47
+expr_list_tail       : 48 50
+expr_prefix          : 39 40
+factor               : 39 40
+factor_prefix        : 42 43
+func_body            : 23
+func_decl            : 21
+func_declarations    : 3 21
+id                   : 1 7 13 14 18 23 35 47 53
+id_list              : 9 36 37
+id_tail              : 13 14
+if_stmt              : 28
+mulop                : 43
+param_decl           : 16 19
+param_decl_list      : 23
+param_decl_tail      : 16 19
 pgm_body             : 1
+postfix_expr         : 42 43
+primary              : 45
 program              : 0
+read_stmt            : 31
+return_stmt          : 33
+stmt                 : 25
+stmt_list            : 24 25 60 61 63 65
+str                  : 7
 string_decl          : 4
 var_decl             : 5
+var_type             : 9 11 18
+while_stmt           : 29
+write_stmt           : 32
 
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . KEYWORDS id KEYWORDS pgm_body KEYWORDS
+
+    KEYWORDS        shift and go to state 2
+
+    program                        shift and go to state 1
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> KEYWORDS . id KEYWORDS pgm_body KEYWORDS
+    (2) id -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 4
+
+    id                             shift and go to state 3
+
+state 3
+
+    (1) program -> KEYWORDS id . KEYWORDS pgm_body KEYWORDS
+
+    KEYWORDS        shift and go to state 5
+
+
+state 4
+
+    (2) id -> IDENTIFIER .
+
+    KEYWORDS        reduce using rule 2 (id -> IDENTIFIER .)
+    OPERATORS       reduce using rule 2 (id -> IDENTIFIER .)
+    IDENTIFIER      reduce using rule 2 (id -> IDENTIFIER .)
+
+
+state 5
+
+    (1) program -> KEYWORDS id KEYWORDS . pgm_body KEYWORDS
+    (3) pgm_body -> . func_declarations
+    (21) func_declarations -> . func_decl func_declarations
+    (22) func_declarations -> . empty
+    (23) func_decl -> . KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+    (66) empty -> .
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 9
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    func_decl                      shift and go to state 6
+    pgm_body                       shift and go to state 10
+    empty                          shift and go to state 8
+    func_declarations              shift and go to state 7
+
+state 6
+
+    (21) func_declarations -> func_decl . func_declarations
+    (21) func_declarations -> . func_decl func_declarations
+    (22) func_declarations -> . empty
+    (23) func_decl -> . KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+    (66) empty -> .
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 9
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    func_decl                      shift and go to state 6
+    func_declarations              shift and go to state 11
+    empty                          shift and go to state 8
+
+state 7
+
+    (3) pgm_body -> func_declarations .
+
+    KEYWORDS        reduce using rule 3 (pgm_body -> func_declarations .)
+
+
+state 8
+
+    (22) func_declarations -> empty .
+
+    KEYWORDS        reduce using rule 22 (func_declarations -> empty .)
+
+
+state 9
+
+    (23) func_decl -> KEYWORDS . any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+    (11) any_type -> . var_type
+    (12) any_type -> . KEYWORDS
+    (10) var_type -> . KEYWORDS
+
+    KEYWORDS        shift and go to state 14
+
+    var_type                       shift and go to state 12
+    any_type                       shift and go to state 13
+
+state 10
+
+    (1) program -> KEYWORDS id KEYWORDS pgm_body . KEYWORDS
+
+    KEYWORDS        shift and go to state 15
+
+
+state 11
+
+    (21) func_declarations -> func_decl func_declarations .
+
+    KEYWORDS        reduce using rule 21 (func_declarations -> func_decl func_declarations .)
+
+
+state 12
+
+    (11) any_type -> var_type .
+
+    IDENTIFIER      reduce using rule 11 (any_type -> var_type .)
+
+
+state 13
+
+    (23) func_decl -> KEYWORDS any_type . id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+    (2) id -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 4
+
+    id                             shift and go to state 16
+
+state 14
+
+    (12) any_type -> KEYWORDS .
+    (10) var_type -> KEYWORDS .
+
+  ! reduce/reduce conflict for IDENTIFIER resolved using rule 10 (var_type -> KEYWORDS .)
+    IDENTIFIER      reduce using rule 10 (var_type -> KEYWORDS .)
+
+  ! IDENTIFIER      [ reduce using rule 12 (any_type -> KEYWORDS .) ]
+
+
+state 15
+
+    (1) program -> KEYWORDS id KEYWORDS pgm_body KEYWORDS .
+
+    $end            reduce using rule 1 (program -> KEYWORDS id KEYWORDS pgm_body KEYWORDS .)
+
+
+state 16
+
+    (23) func_decl -> KEYWORDS any_type id . OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+
+    OPERATORS       shift and go to state 17
+
+
+state 17
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS . param_decl_list OPERATORS KEYWORDS func_body KEYWORDS
+    (16) param_decl_list -> . param_decl param_decl_tail
+    (17) param_decl_list -> . empty
+    (18) param_decl -> . var_type id
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    KEYWORDS        shift and go to state 22
+
+    empty                          shift and go to state 18
+    var_type                       shift and go to state 19
+    param_decl                     shift and go to state 20
+    param_decl_list                shift and go to state 21
+
+state 18
+
+    (17) param_decl_list -> empty .
+
+    OPERATORS       reduce using rule 17 (param_decl_list -> empty .)
+
+
+state 19
+
+    (18) param_decl -> var_type . id
+    (2) id -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 4
+
+    id                             shift and go to state 23
+
+state 20
+
+    (16) param_decl_list -> param_decl . param_decl_tail
+    (19) param_decl_tail -> . param_decl param_decl_tail
+    (20) param_decl_tail -> . empty
+    (18) param_decl -> . var_type id
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    KEYWORDS        shift and go to state 22
+
+    param_decl_tail                shift and go to state 26
+    empty                          shift and go to state 24
+    var_type                       shift and go to state 19
+    param_decl                     shift and go to state 25
+
+state 21
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS param_decl_list . OPERATORS KEYWORDS func_body KEYWORDS
+
+    OPERATORS       shift and go to state 27
+
+
+state 22
+
+    (10) var_type -> KEYWORDS .
+
+    IDENTIFIER      reduce using rule 10 (var_type -> KEYWORDS .)
+
+
+state 23
+
+    (18) param_decl -> var_type id .
+
+    KEYWORDS        reduce using rule 18 (param_decl -> var_type id .)
+    OPERATORS       reduce using rule 18 (param_decl -> var_type id .)
+
+
+state 24
+
+    (20) param_decl_tail -> empty .
+
+    OPERATORS       reduce using rule 20 (param_decl_tail -> empty .)
+
+
+state 25
+
+    (19) param_decl_tail -> param_decl . param_decl_tail
+    (19) param_decl_tail -> . param_decl param_decl_tail
+    (20) param_decl_tail -> . empty
+    (18) param_decl -> . var_type id
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    KEYWORDS        shift and go to state 22
+
+    param_decl_tail                shift and go to state 28
+    empty                          shift and go to state 24
+    var_type                       shift and go to state 19
+    param_decl                     shift and go to state 25
+
+state 26
+
+    (16) param_decl_list -> param_decl param_decl_tail .
+
+    OPERATORS       reduce using rule 16 (param_decl_list -> param_decl param_decl_tail .)
+
+
+state 27
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS . KEYWORDS func_body KEYWORDS
+
+    KEYWORDS        shift and go to state 29
+
+
+state 28
+
+    (19) param_decl_tail -> param_decl param_decl_tail .
+
+    OPERATORS       reduce using rule 19 (param_decl_tail -> param_decl param_decl_tail .)
+
+
+state 29
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS . func_body KEYWORDS
+    (24) func_body -> . decl stmt_list
+    (4) decl -> . string_decl decl
+    (5) decl -> . var_decl
+    (6) decl -> . empty
+    (7) string_decl -> . KEYWORDS id OPERATORS str
+    (9) var_decl -> . var_type id_list
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 36
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    var_type                       shift and go to state 30
+    var_decl                       shift and go to state 31
+    decl                           shift and go to state 32
+    string_decl                    shift and go to state 33
+    empty                          shift and go to state 34
+    func_body                      shift and go to state 35
+
+state 30
+
+    (9) var_decl -> var_type . id_list
+    (13) id_list -> . id id_tail
+    (2) id -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 4
+
+    id                             shift and go to state 37
+    id_list                        shift and go to state 38
+
+state 31
+
+    (5) decl -> var_decl .
+
+    KEYWORDS        reduce using rule 5 (decl -> var_decl .)
+    IDENTIFIER      reduce using rule 5 (decl -> var_decl .)
+    OPERATORS       reduce using rule 5 (decl -> var_decl .)
+
+
+state 32
+
+    (24) func_body -> decl . stmt_list
+    (25) stmt_list -> . stmt stmt_list
+    (26) stmt_list -> . empty
+    (27) stmt -> . base_stmt
+    (28) stmt -> . if_stmt
+    (29) stmt -> . while_stmt
+    (66) empty -> .
+    (30) base_stmt -> . assign_stmt
+    (31) base_stmt -> . read_stmt
+    (32) base_stmt -> . write_stmt
+    (33) base_stmt -> . return_stmt
+    (60) if_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (34) assign_stmt -> . assign_expr
+    (36) read_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (37) write_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (38) return_stmt -> . KEYWORDS expr
+    (35) assign_expr -> . id OPERATORS expr
+    (2) id -> . IDENTIFIER
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 43
+    IDENTIFIER      shift and go to state 4
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    assign_stmt                    shift and go to state 39
+    while_stmt                     shift and go to state 40
+    assign_expr                    shift and go to state 41
+    write_stmt                     shift and go to state 42
+    if_stmt                        shift and go to state 44
+    return_stmt                    shift and go to state 45
+    base_stmt                      shift and go to state 46
+    empty                          shift and go to state 47
+    read_stmt                      shift and go to state 48
+    stmt_list                      shift and go to state 49
+    id                             shift and go to state 50
+    stmt                           shift and go to state 51
+
+state 33
+
+    (4) decl -> string_decl . decl
+    (4) decl -> . string_decl decl
+    (5) decl -> . var_decl
+    (6) decl -> . empty
+    (7) string_decl -> . KEYWORDS id OPERATORS str
+    (9) var_decl -> . var_type id_list
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 36
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+    OPERATORS       reduce using rule 66 (empty -> .)
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    var_type                       shift and go to state 30
+    var_decl                       shift and go to state 31
+    string_decl                    shift and go to state 33
+    empty                          shift and go to state 34
+    decl                           shift and go to state 52
+
+state 34
+
+    (6) decl -> empty .
+
+    KEYWORDS        reduce using rule 6 (decl -> empty .)
+    IDENTIFIER      reduce using rule 6 (decl -> empty .)
+    OPERATORS       reduce using rule 6 (decl -> empty .)
+
+
+state 35
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body . KEYWORDS
+
+    KEYWORDS        shift and go to state 53
+
+
+state 36
+
+    (7) string_decl -> KEYWORDS . id OPERATORS str
+    (10) var_type -> KEYWORDS .
+    (2) id -> . IDENTIFIER
+
+  ! shift/reduce conflict for IDENTIFIER resolved as shift
+    IDENTIFIER      shift and go to state 4
+
+  ! IDENTIFIER      [ reduce using rule 10 (var_type -> KEYWORDS .) ]
+
+    id                             shift and go to state 54
+
+state 37
+
+    (13) id_list -> id . id_tail
+    (14) id_tail -> . id id_tail
+    (15) id_tail -> . empty
+    (2) id -> . IDENTIFIER
+    (66) empty -> .
+
+  ! shift/reduce conflict for IDENTIFIER resolved as shift
+    IDENTIFIER      shift and go to state 4
+    KEYWORDS        reduce using rule 66 (empty -> .)
+    OPERATORS       reduce using rule 66 (empty -> .)
+
+  ! IDENTIFIER      [ reduce using rule 66 (empty -> .) ]
+
+    id_tail                        shift and go to state 55
+    empty                          shift and go to state 56
+    id                             shift and go to state 57
+
+state 38
+
+    (9) var_decl -> var_type id_list .
+
+    KEYWORDS        reduce using rule 9 (var_decl -> var_type id_list .)
+    IDENTIFIER      reduce using rule 9 (var_decl -> var_type id_list .)
+    OPERATORS       reduce using rule 9 (var_decl -> var_type id_list .)
+
+
+state 39
+
+    (30) base_stmt -> assign_stmt .
+
+    KEYWORDS        reduce using rule 30 (base_stmt -> assign_stmt .)
+    IDENTIFIER      reduce using rule 30 (base_stmt -> assign_stmt .)
+    OPERATORS       reduce using rule 30 (base_stmt -> assign_stmt .)
+
+
+state 40
+
+    (29) stmt -> while_stmt .
+
+    KEYWORDS        reduce using rule 29 (stmt -> while_stmt .)
+    IDENTIFIER      reduce using rule 29 (stmt -> while_stmt .)
+    OPERATORS       reduce using rule 29 (stmt -> while_stmt .)
+
+
+state 41
+
+    (34) assign_stmt -> assign_expr .
+
+    KEYWORDS        reduce using rule 34 (assign_stmt -> assign_expr .)
+    IDENTIFIER      reduce using rule 34 (assign_stmt -> assign_expr .)
+    OPERATORS       reduce using rule 34 (assign_stmt -> assign_expr .)
+
+
+state 42
+
+    (32) base_stmt -> write_stmt .
+
+    KEYWORDS        reduce using rule 32 (base_stmt -> write_stmt .)
+    IDENTIFIER      reduce using rule 32 (base_stmt -> write_stmt .)
+    OPERATORS       reduce using rule 32 (base_stmt -> write_stmt .)
+
+
+state 43
+
+    (60) if_stmt -> KEYWORDS . OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS . OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (36) read_stmt -> KEYWORDS . OPERATORS id_list OPERATORS
+    (37) write_stmt -> KEYWORDS . OPERATORS id_list OPERATORS
+    (38) return_stmt -> KEYWORDS . expr
+    (39) expr -> . expr_prefix factor
+    (40) expr_prefix -> . expr_prefix factor addop
+    (41) expr_prefix -> . empty
+    (66) empty -> .
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    OPERATORS       shift and go to state 59
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+  ! OPERATORS       [ reduce using rule 66 (empty -> .) ]
+
+    empty                          shift and go to state 61
+    expr_prefix                    shift and go to state 58
+    expr                           shift and go to state 60
+
+state 44
+
+    (28) stmt -> if_stmt .
+
+    KEYWORDS        reduce using rule 28 (stmt -> if_stmt .)
+    IDENTIFIER      reduce using rule 28 (stmt -> if_stmt .)
+    OPERATORS       reduce using rule 28 (stmt -> if_stmt .)
+
+
+state 45
+
+    (33) base_stmt -> return_stmt .
+
+    KEYWORDS        reduce using rule 33 (base_stmt -> return_stmt .)
+    IDENTIFIER      reduce using rule 33 (base_stmt -> return_stmt .)
+    OPERATORS       reduce using rule 33 (base_stmt -> return_stmt .)
+
+
+state 46
+
+    (27) stmt -> base_stmt .
+
+    KEYWORDS        reduce using rule 27 (stmt -> base_stmt .)
+    IDENTIFIER      reduce using rule 27 (stmt -> base_stmt .)
+    OPERATORS       reduce using rule 27 (stmt -> base_stmt .)
+
+
+state 47
+
+    (26) stmt_list -> empty .
+
+    KEYWORDS        reduce using rule 26 (stmt_list -> empty .)
+    OPERATORS       reduce using rule 26 (stmt_list -> empty .)
+
+
+state 48
+
+    (31) base_stmt -> read_stmt .
+
+    KEYWORDS        reduce using rule 31 (base_stmt -> read_stmt .)
+    IDENTIFIER      reduce using rule 31 (base_stmt -> read_stmt .)
+    OPERATORS       reduce using rule 31 (base_stmt -> read_stmt .)
+
+
+state 49
+
+    (24) func_body -> decl stmt_list .
+
+    KEYWORDS        reduce using rule 24 (func_body -> decl stmt_list .)
+
+
+state 50
+
+    (35) assign_expr -> id . OPERATORS expr
+
+    OPERATORS       shift and go to state 62
+
+
+state 51
+
+    (25) stmt_list -> stmt . stmt_list
+    (25) stmt_list -> . stmt stmt_list
+    (26) stmt_list -> . empty
+    (27) stmt -> . base_stmt
+    (28) stmt -> . if_stmt
+    (29) stmt -> . while_stmt
+    (66) empty -> .
+    (30) base_stmt -> . assign_stmt
+    (31) base_stmt -> . read_stmt
+    (32) base_stmt -> . write_stmt
+    (33) base_stmt -> . return_stmt
+    (60) if_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (34) assign_stmt -> . assign_expr
+    (36) read_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (37) write_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (38) return_stmt -> . KEYWORDS expr
+    (35) assign_expr -> . id OPERATORS expr
+    (2) id -> . IDENTIFIER
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    OPERATORS       reduce using rule 66 (empty -> .)
+    KEYWORDS        shift and go to state 43
+    IDENTIFIER      shift and go to state 4
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    assign_stmt                    shift and go to state 39
+    while_stmt                     shift and go to state 40
+    assign_expr                    shift and go to state 41
+    write_stmt                     shift and go to state 42
+    empty                          shift and go to state 47
+    if_stmt                        shift and go to state 44
+    return_stmt                    shift and go to state 45
+    base_stmt                      shift and go to state 46
+    read_stmt                      shift and go to state 48
+    stmt_list                      shift and go to state 63
+    id                             shift and go to state 50
+    stmt                           shift and go to state 51
+
+state 52
+
+    (4) decl -> string_decl decl .
+
+    KEYWORDS        reduce using rule 4 (decl -> string_decl decl .)
+    IDENTIFIER      reduce using rule 4 (decl -> string_decl decl .)
+    OPERATORS       reduce using rule 4 (decl -> string_decl decl .)
+
+
+state 53
+
+    (23) func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS .
+
+    KEYWORDS        reduce using rule 23 (func_decl -> KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS .)
+
+
+state 54
+
+    (7) string_decl -> KEYWORDS id . OPERATORS str
+
+    OPERATORS       shift and go to state 64
+
+
+state 55
+
+    (13) id_list -> id id_tail .
+
+    KEYWORDS        reduce using rule 13 (id_list -> id id_tail .)
+    IDENTIFIER      reduce using rule 13 (id_list -> id id_tail .)
+    OPERATORS       reduce using rule 13 (id_list -> id id_tail .)
+
+
+state 56
+
+    (15) id_tail -> empty .
+
+    KEYWORDS        reduce using rule 15 (id_tail -> empty .)
+    IDENTIFIER      reduce using rule 15 (id_tail -> empty .)
+    OPERATORS       reduce using rule 15 (id_tail -> empty .)
+
+
+state 57
+
+    (14) id_tail -> id . id_tail
+    (14) id_tail -> . id id_tail
+    (15) id_tail -> . empty
+    (2) id -> . IDENTIFIER
+    (66) empty -> .
+
+  ! shift/reduce conflict for IDENTIFIER resolved as shift
+    IDENTIFIER      shift and go to state 4
+    KEYWORDS        reduce using rule 66 (empty -> .)
+    OPERATORS       reduce using rule 66 (empty -> .)
+
+  ! IDENTIFIER      [ reduce using rule 66 (empty -> .) ]
+
+    id_tail                        shift and go to state 65
+    empty                          shift and go to state 56
+    id                             shift and go to state 57
+
+state 58
+
+    (39) expr -> expr_prefix . factor
+    (40) expr_prefix -> expr_prefix . factor addop
+    (42) factor -> . factor_prefix postfix_expr
+    (43) factor_prefix -> . factor_prefix postfix_expr mulop
+    (44) factor_prefix -> . empty
+    (66) empty -> .
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+    factor                         shift and go to state 66
+    empty                          shift and go to state 67
+    factor_prefix                  shift and go to state 68
+
+state 59
+
+    (60) if_stmt -> KEYWORDS OPERATORS . cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS OPERATORS . cond OPERATORS decl stmt_list KEYWORDS
+    (36) read_stmt -> KEYWORDS OPERATORS . id_list OPERATORS
+    (37) write_stmt -> KEYWORDS OPERATORS . id_list OPERATORS
+    (63) cond -> . KEYWORDS decl stmt_list
+    (64) cond -> . empty
+    (13) id_list -> . id id_tail
+    (66) empty -> .
+    (2) id -> . IDENTIFIER
+
+    KEYWORDS        shift and go to state 72
+    OPERATORS       reduce using rule 66 (empty -> .)
+    IDENTIFIER      shift and go to state 4
+
+    empty                          shift and go to state 69
+    id_list                        shift and go to state 70
+    cond                           shift and go to state 71
+    id                             shift and go to state 37
+
+state 60
+
+    (38) return_stmt -> KEYWORDS expr .
+
+    KEYWORDS        reduce using rule 38 (return_stmt -> KEYWORDS expr .)
+    IDENTIFIER      reduce using rule 38 (return_stmt -> KEYWORDS expr .)
+    OPERATORS       reduce using rule 38 (return_stmt -> KEYWORDS expr .)
+
+
+state 61
+
+    (41) expr_prefix -> empty .
+
+    OPERATORS       reduce using rule 41 (expr_prefix -> empty .)
+    INTLITERAL      reduce using rule 41 (expr_prefix -> empty .)
+    FLOATLITERAL    reduce using rule 41 (expr_prefix -> empty .)
+    IDENTIFIER      reduce using rule 41 (expr_prefix -> empty .)
+
+
+state 62
+
+    (35) assign_expr -> id OPERATORS . expr
+    (39) expr -> . expr_prefix factor
+    (40) expr_prefix -> . expr_prefix factor addop
+    (41) expr_prefix -> . empty
+    (66) empty -> .
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+    expr_prefix                    shift and go to state 58
+    empty                          shift and go to state 61
+    expr                           shift and go to state 73
+
+state 63
+
+    (25) stmt_list -> stmt stmt_list .
+
+    KEYWORDS        reduce using rule 25 (stmt_list -> stmt stmt_list .)
+    OPERATORS       reduce using rule 25 (stmt_list -> stmt stmt_list .)
+
+
+state 64
+
+    (7) string_decl -> KEYWORDS id OPERATORS . str
+    (8) str -> . STRINGLITERAL
+
+    STRINGLITERAL   shift and go to state 75
+
+    str                            shift and go to state 74
+
+state 65
+
+    (14) id_tail -> id id_tail .
+
+    KEYWORDS        reduce using rule 14 (id_tail -> id id_tail .)
+    IDENTIFIER      reduce using rule 14 (id_tail -> id id_tail .)
+    OPERATORS       reduce using rule 14 (id_tail -> id id_tail .)
+
+
+state 66
+
+    (39) expr -> expr_prefix factor .
+    (40) expr_prefix -> expr_prefix factor . addop
+    (56) addop -> . OPERATORS OPERATORS
+    (57) addop -> . OPERATORS
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    KEYWORDS        reduce using rule 39 (expr -> expr_prefix factor .)
+    IDENTIFIER      reduce using rule 39 (expr -> expr_prefix factor .)
+    OPERATORS       shift and go to state 77
+
+  ! OPERATORS       [ reduce using rule 39 (expr -> expr_prefix factor .) ]
+
+    addop                          shift and go to state 76
+
+state 67
+
+    (44) factor_prefix -> empty .
+
+    OPERATORS       reduce using rule 44 (factor_prefix -> empty .)
+    INTLITERAL      reduce using rule 44 (factor_prefix -> empty .)
+    FLOATLITERAL    reduce using rule 44 (factor_prefix -> empty .)
+    IDENTIFIER      reduce using rule 44 (factor_prefix -> empty .)
+
+
+state 68
+
+    (42) factor -> factor_prefix . postfix_expr
+    (43) factor_prefix -> factor_prefix . postfix_expr mulop
+    (45) postfix_expr -> . primary
+    (46) postfix_expr -> . call_expr
+    (52) primary -> . OPERATORS expr OPERATORS
+    (53) primary -> . id
+    (54) primary -> . INTLITERAL
+    (55) primary -> . FLOATLITERAL
+    (47) call_expr -> . id OPERATORS expr_list OPERATORS
+    (2) id -> . IDENTIFIER
+
+    OPERATORS       shift and go to state 79
+    INTLITERAL      shift and go to state 83
+    FLOATLITERAL    shift and go to state 82
+    IDENTIFIER      shift and go to state 4
+
+    postfix_expr                   shift and go to state 78
+    primary                        shift and go to state 81
+    id                             shift and go to state 84
+    call_expr                      shift and go to state 80
+
+state 69
+
+    (64) cond -> empty .
+
+    OPERATORS       reduce using rule 64 (cond -> empty .)
+
+
+state 70
+
+    (36) read_stmt -> KEYWORDS OPERATORS id_list . OPERATORS
+    (37) write_stmt -> KEYWORDS OPERATORS id_list . OPERATORS
+
+    OPERATORS       shift and go to state 85
+
+
+state 71
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond . OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS OPERATORS cond . OPERATORS decl stmt_list KEYWORDS
+
+    OPERATORS       shift and go to state 86
+
+
+state 72
+
+    (63) cond -> KEYWORDS . decl stmt_list
+    (4) decl -> . string_decl decl
+    (5) decl -> . var_decl
+    (6) decl -> . empty
+    (7) string_decl -> . KEYWORDS id OPERATORS str
+    (9) var_decl -> . var_type id_list
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 36
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+    OPERATORS       reduce using rule 66 (empty -> .)
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    var_type                       shift and go to state 30
+    var_decl                       shift and go to state 31
+    string_decl                    shift and go to state 33
+    empty                          shift and go to state 34
+    decl                           shift and go to state 87
+
+state 73
+
+    (35) assign_expr -> id OPERATORS expr .
+
+    KEYWORDS        reduce using rule 35 (assign_expr -> id OPERATORS expr .)
+    IDENTIFIER      reduce using rule 35 (assign_expr -> id OPERATORS expr .)
+    OPERATORS       reduce using rule 35 (assign_expr -> id OPERATORS expr .)
+
+
+state 74
+
+    (7) string_decl -> KEYWORDS id OPERATORS str .
+
+    KEYWORDS        reduce using rule 7 (string_decl -> KEYWORDS id OPERATORS str .)
+    IDENTIFIER      reduce using rule 7 (string_decl -> KEYWORDS id OPERATORS str .)
+    OPERATORS       reduce using rule 7 (string_decl -> KEYWORDS id OPERATORS str .)
+
+
+state 75
+
+    (8) str -> STRINGLITERAL .
+
+    KEYWORDS        reduce using rule 8 (str -> STRINGLITERAL .)
+    IDENTIFIER      reduce using rule 8 (str -> STRINGLITERAL .)
+    OPERATORS       reduce using rule 8 (str -> STRINGLITERAL .)
+
+
+state 76
+
+    (40) expr_prefix -> expr_prefix factor addop .
+
+    OPERATORS       reduce using rule 40 (expr_prefix -> expr_prefix factor addop .)
+    INTLITERAL      reduce using rule 40 (expr_prefix -> expr_prefix factor addop .)
+    FLOATLITERAL    reduce using rule 40 (expr_prefix -> expr_prefix factor addop .)
+    IDENTIFIER      reduce using rule 40 (expr_prefix -> expr_prefix factor addop .)
+
+
+state 77
+
+    (56) addop -> OPERATORS . OPERATORS
+    (57) addop -> OPERATORS .
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    OPERATORS       shift and go to state 88
+    INTLITERAL      reduce using rule 57 (addop -> OPERATORS .)
+    FLOATLITERAL    reduce using rule 57 (addop -> OPERATORS .)
+    IDENTIFIER      reduce using rule 57 (addop -> OPERATORS .)
+
+  ! OPERATORS       [ reduce using rule 57 (addop -> OPERATORS .) ]
+
+
+state 78
+
+    (42) factor -> factor_prefix postfix_expr .
+    (43) factor_prefix -> factor_prefix postfix_expr . mulop
+    (58) mulop -> . OPERATORS OPERATORS
+    (59) mulop -> . OPERATORS
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    KEYWORDS        reduce using rule 42 (factor -> factor_prefix postfix_expr .)
+    IDENTIFIER      reduce using rule 42 (factor -> factor_prefix postfix_expr .)
+    OPERATORS       shift and go to state 89
+
+  ! OPERATORS       [ reduce using rule 42 (factor -> factor_prefix postfix_expr .) ]
+
+    mulop                          shift and go to state 90
+
+state 79
+
+    (52) primary -> OPERATORS . expr OPERATORS
+    (39) expr -> . expr_prefix factor
+    (40) expr_prefix -> . expr_prefix factor addop
+    (41) expr_prefix -> . empty
+    (66) empty -> .
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+    empty                          shift and go to state 61
+    expr_prefix                    shift and go to state 58
+    expr                           shift and go to state 91
+
+state 80
+
+    (46) postfix_expr -> call_expr .
+
+    OPERATORS       reduce using rule 46 (postfix_expr -> call_expr .)
+    KEYWORDS        reduce using rule 46 (postfix_expr -> call_expr .)
+    IDENTIFIER      reduce using rule 46 (postfix_expr -> call_expr .)
+
+
+state 81
+
+    (45) postfix_expr -> primary .
+
+    OPERATORS       reduce using rule 45 (postfix_expr -> primary .)
+    KEYWORDS        reduce using rule 45 (postfix_expr -> primary .)
+    IDENTIFIER      reduce using rule 45 (postfix_expr -> primary .)
+
+
+state 82
+
+    (55) primary -> FLOATLITERAL .
+
+    OPERATORS       reduce using rule 55 (primary -> FLOATLITERAL .)
+    KEYWORDS        reduce using rule 55 (primary -> FLOATLITERAL .)
+    IDENTIFIER      reduce using rule 55 (primary -> FLOATLITERAL .)
+
+
+state 83
+
+    (54) primary -> INTLITERAL .
+
+    OPERATORS       reduce using rule 54 (primary -> INTLITERAL .)
+    KEYWORDS        reduce using rule 54 (primary -> INTLITERAL .)
+    IDENTIFIER      reduce using rule 54 (primary -> INTLITERAL .)
+
+
+state 84
+
+    (53) primary -> id .
+    (47) call_expr -> id . OPERATORS expr_list OPERATORS
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    KEYWORDS        reduce using rule 53 (primary -> id .)
+    IDENTIFIER      reduce using rule 53 (primary -> id .)
+    OPERATORS       shift and go to state 92
+
+  ! OPERATORS       [ reduce using rule 53 (primary -> id .) ]
+
+
+state 85
+
+    (36) read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .
+    (37) write_stmt -> KEYWORDS OPERATORS id_list OPERATORS .
+
+  ! reduce/reduce conflict for KEYWORDS resolved using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+  ! reduce/reduce conflict for IDENTIFIER resolved using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+  ! reduce/reduce conflict for OPERATORS resolved using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+    KEYWORDS        reduce using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+    IDENTIFIER      reduce using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+    OPERATORS       reduce using rule 36 (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS .)
+
+  ! KEYWORDS        [ reduce using rule 37 (write_stmt -> KEYWORDS OPERATORS id_list OPERATORS .) ]
+  ! IDENTIFIER      [ reduce using rule 37 (write_stmt -> KEYWORDS OPERATORS id_list OPERATORS .) ]
+  ! OPERATORS       [ reduce using rule 37 (write_stmt -> KEYWORDS OPERATORS id_list OPERATORS .) ]
+
+
+state 86
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond OPERATORS . decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS OPERATORS cond OPERATORS . decl stmt_list KEYWORDS
+    (4) decl -> . string_decl decl
+    (5) decl -> . var_decl
+    (6) decl -> . empty
+    (7) string_decl -> . KEYWORDS id OPERATORS str
+    (9) var_decl -> . var_type id_list
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 36
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    empty                          shift and go to state 34
+    var_type                       shift and go to state 30
+    var_decl                       shift and go to state 31
+    string_decl                    shift and go to state 33
+    decl                           shift and go to state 93
+
+state 87
+
+    (63) cond -> KEYWORDS decl . stmt_list
+    (25) stmt_list -> . stmt stmt_list
+    (26) stmt_list -> . empty
+    (27) stmt -> . base_stmt
+    (28) stmt -> . if_stmt
+    (29) stmt -> . while_stmt
+    (66) empty -> .
+    (30) base_stmt -> . assign_stmt
+    (31) base_stmt -> . read_stmt
+    (32) base_stmt -> . write_stmt
+    (33) base_stmt -> . return_stmt
+    (60) if_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (34) assign_stmt -> . assign_expr
+    (36) read_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (37) write_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (38) return_stmt -> . KEYWORDS expr
+    (35) assign_expr -> . id OPERATORS expr
+    (2) id -> . IDENTIFIER
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    KEYWORDS        shift and go to state 43
+    IDENTIFIER      shift and go to state 4
+
+    assign_stmt                    shift and go to state 39
+    while_stmt                     shift and go to state 40
+    assign_expr                    shift and go to state 41
+    write_stmt                     shift and go to state 42
+    if_stmt                        shift and go to state 44
+    return_stmt                    shift and go to state 45
+    base_stmt                      shift and go to state 46
+    empty                          shift and go to state 47
+    read_stmt                      shift and go to state 48
+    stmt_list                      shift and go to state 94
+    id                             shift and go to state 50
+    stmt                           shift and go to state 51
+
+state 88
+
+    (56) addop -> OPERATORS OPERATORS .
+
+    OPERATORS       reduce using rule 56 (addop -> OPERATORS OPERATORS .)
+    INTLITERAL      reduce using rule 56 (addop -> OPERATORS OPERATORS .)
+    FLOATLITERAL    reduce using rule 56 (addop -> OPERATORS OPERATORS .)
+    IDENTIFIER      reduce using rule 56 (addop -> OPERATORS OPERATORS .)
+
+
+state 89
+
+    (58) mulop -> OPERATORS . OPERATORS
+    (59) mulop -> OPERATORS .
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    OPERATORS       shift and go to state 95
+    INTLITERAL      reduce using rule 59 (mulop -> OPERATORS .)
+    FLOATLITERAL    reduce using rule 59 (mulop -> OPERATORS .)
+    IDENTIFIER      reduce using rule 59 (mulop -> OPERATORS .)
+
+  ! OPERATORS       [ reduce using rule 59 (mulop -> OPERATORS .) ]
+
+
+state 90
+
+    (43) factor_prefix -> factor_prefix postfix_expr mulop .
+
+    OPERATORS       reduce using rule 43 (factor_prefix -> factor_prefix postfix_expr mulop .)
+    INTLITERAL      reduce using rule 43 (factor_prefix -> factor_prefix postfix_expr mulop .)
+    FLOATLITERAL    reduce using rule 43 (factor_prefix -> factor_prefix postfix_expr mulop .)
+    IDENTIFIER      reduce using rule 43 (factor_prefix -> factor_prefix postfix_expr mulop .)
+
+
+state 91
+
+    (52) primary -> OPERATORS expr . OPERATORS
+
+    OPERATORS       shift and go to state 96
+
+
+state 92
+
+    (47) call_expr -> id OPERATORS . expr_list OPERATORS
+    (48) expr_list -> . expr expr_list_tail
+    (49) expr_list -> . empty
+    (39) expr -> . expr_prefix factor
+    (66) empty -> .
+    (40) expr_prefix -> . expr_prefix factor addop
+    (41) expr_prefix -> . empty
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+    expr_prefix                    shift and go to state 58
+    empty                          shift and go to state 97
+    expr_list                      shift and go to state 98
+    expr                           shift and go to state 99
+
+state 93
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl . stmt_list else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl . stmt_list KEYWORDS
+    (25) stmt_list -> . stmt stmt_list
+    (26) stmt_list -> . empty
+    (27) stmt -> . base_stmt
+    (28) stmt -> . if_stmt
+    (29) stmt -> . while_stmt
+    (66) empty -> .
+    (30) base_stmt -> . assign_stmt
+    (31) base_stmt -> . read_stmt
+    (32) base_stmt -> . write_stmt
+    (33) base_stmt -> . return_stmt
+    (60) if_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (34) assign_stmt -> . assign_expr
+    (36) read_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (37) write_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (38) return_stmt -> . KEYWORDS expr
+    (35) assign_expr -> . id OPERATORS expr
+    (2) id -> . IDENTIFIER
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 43
+    IDENTIFIER      shift and go to state 4
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    assign_stmt                    shift and go to state 39
+    base_stmt                      shift and go to state 46
+    assign_expr                    shift and go to state 41
+    read_stmt                      shift and go to state 48
+    write_stmt                     shift and go to state 42
+    if_stmt                        shift and go to state 44
+    return_stmt                    shift and go to state 45
+    while_stmt                     shift and go to state 40
+    empty                          shift and go to state 47
+    stmt_list                      shift and go to state 100
+    id                             shift and go to state 50
+    stmt                           shift and go to state 51
+
+state 94
+
+    (63) cond -> KEYWORDS decl stmt_list .
+
+    OPERATORS       reduce using rule 63 (cond -> KEYWORDS decl stmt_list .)
+
+
+state 95
+
+    (58) mulop -> OPERATORS OPERATORS .
+
+    OPERATORS       reduce using rule 58 (mulop -> OPERATORS OPERATORS .)
+    INTLITERAL      reduce using rule 58 (mulop -> OPERATORS OPERATORS .)
+    FLOATLITERAL    reduce using rule 58 (mulop -> OPERATORS OPERATORS .)
+    IDENTIFIER      reduce using rule 58 (mulop -> OPERATORS OPERATORS .)
+
+
+state 96
+
+    (52) primary -> OPERATORS expr OPERATORS .
+
+    OPERATORS       reduce using rule 52 (primary -> OPERATORS expr OPERATORS .)
+    KEYWORDS        reduce using rule 52 (primary -> OPERATORS expr OPERATORS .)
+    IDENTIFIER      reduce using rule 52 (primary -> OPERATORS expr OPERATORS .)
+
+
+state 97
+
+    (49) expr_list -> empty .
+    (41) expr_prefix -> empty .
+
+  ! reduce/reduce conflict for OPERATORS resolved using rule 41 (expr_prefix -> empty .)
+    OPERATORS       reduce using rule 41 (expr_prefix -> empty .)
+    INTLITERAL      reduce using rule 41 (expr_prefix -> empty .)
+    FLOATLITERAL    reduce using rule 41 (expr_prefix -> empty .)
+    IDENTIFIER      reduce using rule 41 (expr_prefix -> empty .)
+
+  ! OPERATORS       [ reduce using rule 49 (expr_list -> empty .) ]
+
+
+state 98
+
+    (47) call_expr -> id OPERATORS expr_list . OPERATORS
+
+    OPERATORS       shift and go to state 101
+
+
+state 99
+
+    (48) expr_list -> expr . expr_list_tail
+    (50) expr_list_tail -> . OPERATORS OPERATORS expr expr_list_tail
+    (51) expr_list_tail -> . empty
+    (66) empty -> .
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    OPERATORS       shift and go to state 104
+
+  ! OPERATORS       [ reduce using rule 66 (empty -> .) ]
+
+    empty                          shift and go to state 102
+    expr_list_tail                 shift and go to state 103
+
+state 100
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list . else_part KEYWORDS
+    (65) while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list . KEYWORDS
+    (61) else_part -> . KEYWORDS decl stmt_list
+    (62) else_part -> . empty
+    (66) empty -> .
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 107
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    else_part                      shift and go to state 106
+    empty                          shift and go to state 105
+
+state 101
+
+    (47) call_expr -> id OPERATORS expr_list OPERATORS .
+
+    OPERATORS       reduce using rule 47 (call_expr -> id OPERATORS expr_list OPERATORS .)
+    KEYWORDS        reduce using rule 47 (call_expr -> id OPERATORS expr_list OPERATORS .)
+    IDENTIFIER      reduce using rule 47 (call_expr -> id OPERATORS expr_list OPERATORS .)
+
+
+state 102
+
+    (51) expr_list_tail -> empty .
+
+    OPERATORS       reduce using rule 51 (expr_list_tail -> empty .)
+
+
+state 103
+
+    (48) expr_list -> expr expr_list_tail .
+
+    OPERATORS       reduce using rule 48 (expr_list -> expr expr_list_tail .)
+
+
+state 104
+
+    (50) expr_list_tail -> OPERATORS . OPERATORS expr expr_list_tail
+
+    OPERATORS       shift and go to state 108
+
+
+state 105
+
+    (62) else_part -> empty .
+
+    KEYWORDS        reduce using rule 62 (else_part -> empty .)
+
+
+state 106
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part . KEYWORDS
+
+    KEYWORDS        shift and go to state 109
+
+
+state 107
+
+    (65) while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS .
+    (61) else_part -> KEYWORDS . decl stmt_list
+    (4) decl -> . string_decl decl
+    (5) decl -> . var_decl
+    (6) decl -> . empty
+    (7) string_decl -> . KEYWORDS id OPERATORS str
+    (9) var_decl -> . var_type id_list
+    (66) empty -> .
+    (10) var_type -> . KEYWORDS
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+  ! reduce/reduce conflict for IDENTIFIER resolved using rule 65 (while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS .)
+    IDENTIFIER      reduce using rule 65 (while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS .)
+    OPERATORS       reduce using rule 65 (while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS .)
+    KEYWORDS        shift and go to state 36
+
+  ! KEYWORDS        [ reduce using rule 65 (while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS .) ]
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+  ! IDENTIFIER      [ reduce using rule 66 (empty -> .) ]
+
+    empty                          shift and go to state 34
+    var_type                       shift and go to state 30
+    var_decl                       shift and go to state 31
+    string_decl                    shift and go to state 33
+    decl                           shift and go to state 110
+
+state 108
+
+    (50) expr_list_tail -> OPERATORS OPERATORS . expr expr_list_tail
+    (39) expr -> . expr_prefix factor
+    (40) expr_prefix -> . expr_prefix factor addop
+    (41) expr_prefix -> . empty
+    (66) empty -> .
+
+    OPERATORS       reduce using rule 66 (empty -> .)
+    INTLITERAL      reduce using rule 66 (empty -> .)
+    FLOATLITERAL    reduce using rule 66 (empty -> .)
+    IDENTIFIER      reduce using rule 66 (empty -> .)
+
+    expr_prefix                    shift and go to state 58
+    empty                          shift and go to state 61
+    expr                           shift and go to state 111
+
+state 109
+
+    (60) if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS .
+
+    KEYWORDS        reduce using rule 60 (if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS .)
+    IDENTIFIER      reduce using rule 60 (if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS .)
+    OPERATORS       reduce using rule 60 (if_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS .)
+
+
+state 110
+
+    (61) else_part -> KEYWORDS decl . stmt_list
+    (25) stmt_list -> . stmt stmt_list
+    (26) stmt_list -> . empty
+    (27) stmt -> . base_stmt
+    (28) stmt -> . if_stmt
+    (29) stmt -> . while_stmt
+    (66) empty -> .
+    (30) base_stmt -> . assign_stmt
+    (31) base_stmt -> . read_stmt
+    (32) base_stmt -> . write_stmt
+    (33) base_stmt -> . return_stmt
+    (60) if_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS
+    (65) while_stmt -> . KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS
+    (34) assign_stmt -> . assign_expr
+    (36) read_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (37) write_stmt -> . KEYWORDS OPERATORS id_list OPERATORS
+    (38) return_stmt -> . KEYWORDS expr
+    (35) assign_expr -> . id OPERATORS expr
+    (2) id -> . IDENTIFIER
+
+  ! shift/reduce conflict for KEYWORDS resolved as shift
+    KEYWORDS        shift and go to state 43
+    IDENTIFIER      shift and go to state 4
+
+  ! KEYWORDS        [ reduce using rule 66 (empty -> .) ]
+
+    assign_stmt                    shift and go to state 39
+    while_stmt                     shift and go to state 40
+    assign_expr                    shift and go to state 41
+    write_stmt                     shift and go to state 42
+    if_stmt                        shift and go to state 44
+    return_stmt                    shift and go to state 45
+    base_stmt                      shift and go to state 46
+    empty                          shift and go to state 47
+    read_stmt                      shift and go to state 48
+    stmt_list                      shift and go to state 112
+    id                             shift and go to state 50
+    stmt                           shift and go to state 51
+
+state 111
+
+    (50) expr_list_tail -> OPERATORS OPERATORS expr . expr_list_tail
+    (50) expr_list_tail -> . OPERATORS OPERATORS expr expr_list_tail
+    (51) expr_list_tail -> . empty
+    (66) empty -> .
+
+  ! shift/reduce conflict for OPERATORS resolved as shift
+    OPERATORS       shift and go to state 104
+
+  ! OPERATORS       [ reduce using rule 66 (empty -> .) ]
+
+    empty                          shift and go to state 102
+    expr_list_tail                 shift and go to state 113
+
+state 112
+
+    (61) else_part -> KEYWORDS decl stmt_list .
+
+    KEYWORDS        reduce using rule 61 (else_part -> KEYWORDS decl stmt_list .)
+
+
+state 113
+
+    (50) expr_list_tail -> OPERATORS OPERATORS expr expr_list_tail .
+
+    OPERATORS       reduce using rule 50 (expr_list_tail -> OPERATORS OPERATORS expr expr_list_tail .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for KEYWORDS in state 5 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 6 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 29 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 32 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 33 resolved as shift
+WARNING: shift/reduce conflict for IDENTIFIER in state 36 resolved as shift
+WARNING: shift/reduce conflict for IDENTIFIER in state 37 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 43 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 51 resolved as shift
+WARNING: shift/reduce conflict for IDENTIFIER in state 57 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 66 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 72 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 77 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 78 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 84 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 86 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 89 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 93 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 99 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 100 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 107 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 107 resolved as shift
+WARNING: shift/reduce conflict for KEYWORDS in state 110 resolved as shift
+WARNING: shift/reduce conflict for OPERATORS in state 111 resolved as shift
+WARNING: reduce/reduce conflict in state 14 resolved using rule (var_type -> KEYWORDS)
+WARNING: rejected rule (any_type -> KEYWORDS) in state 14
+WARNING: reduce/reduce conflict in state 85 resolved using rule (read_stmt -> KEYWORDS OPERATORS id_list OPERATORS)
+WARNING: rejected rule (write_stmt -> KEYWORDS OPERATORS id_list OPERATORS) in state 85
+WARNING: reduce/reduce conflict in state 97 resolved using rule (expr_prefix -> empty)
+WARNING: rejected rule (expr_list -> empty) in state 97
+WARNING: reduce/reduce conflict in state 107 resolved using rule (while_stmt -> KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS)
+WARNING: rejected rule (empty -> <empty>) in state 107
+WARNING: Rule (any_type -> KEYWORDS) is never reduced
+WARNING: Rule (write_stmt -> KEYWORDS OPERATORS id_list OPERATORS) is never reduced
+WARNING: Rule (expr_list -> empty) is never reduced

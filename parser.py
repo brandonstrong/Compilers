@@ -1,4 +1,5 @@
 import ply.yacc as yacc
+import ply.lex as lex
 from scanner import tokens
 import sys
 
@@ -25,7 +26,7 @@ def p_program_decl(p):
 # Global String
 
 def p_gstring_string_decl(p):
-    'string_decl : KEYWORDS id := str'
+    'string_decl : KEYWORDS id OPERATORS str'
 
 def p_gstring_str(p):
     'str : STRINGLITERAL'
@@ -36,7 +37,7 @@ def p_variables_var_decl(p):
     'var_decl : var_type id_list'
 
 def p_variables_var_type(p):
-    'var_type : KEYWORD'
+    'var_type : KEYWORDS'
 
 def p_variables_any_type(p):
     '''any_type : var_type
@@ -69,7 +70,7 @@ def p_fdecl_func_declarations(p):
     | empty'''
 
 def p_fdecl_func_decl(p):
-    'func_decl : KEYWORDS any_type id (param_decl_list) KEYWORDS func_body KEYWORDS'
+    'func_decl : KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS'
 
 def p_fdecl_func_body(p):
     'func_body : decl stmt_list'
@@ -91,21 +92,21 @@ def p_statements_base_stmt(p):
     | write_stmt
     | return_stmt'''
 
-##Basic bitch statements
+# Basic bitch statements
 def p_basic_assign_stmt(p):
-   'assign_stmt: assign_expr ;'
+   'assign_stmt : assign_expr'
    
 def p_basic_assign_expr(p):
-   'assign_expr: id := espr'
+   'assign_expr : id OPERATORS expr'
    
 def p_basic_read_stmt(p):
-   'read_stmt: KEYWORDS ( id_list );'
+   'read_stmt : KEYWORDS OPERATORS id_list OPERATORS'
    
 def p_basic_write_stmt(p):
-   'write_stmt: KEYWORDS (id_list );'
+   'write_stmt : KEYWORDS OPERATORS id_list OPERATORS'
    
 def p_basic_return_stmt(p):
-   'return_stmt: KEYWORDS expr ;'
+   'return_stmt : KEYWORDS expr '
    
    
 # Expressions List	
@@ -129,49 +130,57 @@ def p_expressions_postfix_expr(p):
     | call_expr'''
 
 def p_expressions_call_expr(p):
-    'call_expr : id ( expr_list )'
+    'call_expr : id OPERATORS expr_list OPERATORS'
 
 def p_expressions_expr_list(p):
     '''expr_list : expr expr_list_tail
     | empty'''
 
 def p_expressions_expr_list_tail(p):
-    '''expr_list_tail : , expr expr_list_tail
+    '''expr_list_tail : OPERATORS OPERATORS expr expr_list_tail
     | empty'''
 
 def p_expressions_primary(p):
-    '''primary : ( expr )
+    '''primary : OPERATORS expr OPERATORS
     | id
     | INTLITERAL
     | FLOATLITERAL'''
 
 def p_expressions_addop(p):
-    '''addop : +
-    | -'''
+    '''addop : OPERATORS OPERATORS
+    | OPERATORS'''
 
 def p_expressions_mulop(p):
-    '''mulop : *
-    | /'''	
+    '''mulop : OPERATORS OPERATORS
+    | OPERATORS'''
 
-##Complex Statemetns
+# Complex Statemetns
 def p_complex_if_stmt(p):
-   'if_stmt: KEYWORDS ( cond ) decl stmt_list else_part KEYWORDS'
+   'if_stmt : KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS'
    
 def p_complex_else_part(p):
-   '''else_part: KEYWORDS decl stmt_list 
+   '''else_part : KEYWORDS decl stmt_list
    | empty'''
    
 def p_complex_cond(p):
-   '''else_part: KEYWORDS decl stmt_list
+   '''cond : KEYWORDS decl stmt_list
    | empty'''
-	
-#Error handling
+
+# While statement
+
+def p_whilestatement_while_stmt(p):
+    'while_stmt : KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS'
+
+# Empty
+
+def p_empty(p):
+    'empty :'
+    pass
+
+# Error handling
 
 def p_error(p):
     print('Syntax error in input!')
-
-# Build parser
-parser = yacc.yacc()
 
 while True:
     try:
