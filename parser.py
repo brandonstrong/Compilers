@@ -29,7 +29,7 @@ def p_program_decl(p):
 # Global String
 
 def p_gstring_string_decl(p):
-    'string_decl : KEYWORDS id OPERATORS str'
+    'string_decl : STRING id OPERATORS str'
     pass
 
 def p_gstring_str(p):
@@ -43,12 +43,13 @@ def p_variables_var_decl(p):
     pass
 
 def p_variables_var_type(p):
-    'var_type : KEYWORDS'
+    '''var_type : FLOAT
+    | INT'''
     pass
 
 def p_variables_any_type(p):
     '''any_type : var_type
-    | KEYWORDS'''
+    | VOID'''
     pass
 
 def p_variables_id_list(p):
@@ -84,7 +85,7 @@ def p_fdecl_func_declarations(p):
     pass
 
 def p_fdecl_func_decl(p):
-    'func_decl : KEYWORDS any_type id OPERATORS param_decl_list OPERATORS KEYWORDS func_body KEYWORDS'
+    'func_decl : FUNCTION any_type id OPERATORS param_decl_list OPERATORS BEGIN func_body END'
     pass
 
 def p_fdecl_func_body(p):
@@ -115,26 +116,26 @@ def p_statements_base_stmt(p):
 def p_basic_assign_stmt(p):
    'assign_stmt : assign_expr'
    pass
-   
+
 def p_basic_assign_expr(p):
    'assign_expr : id OPERATORS expr'
    pass
-   
+
 def p_basic_read_stmt(p):
-   'read_stmt : KEYWORDS OPERATORS id_list OPERATORS'
+   'read_stmt : READ OPERATORS id_list OPERATORS'
    pass
-   
+
 def p_basic_write_stmt(p):
-   'write_stmt : KEYWORDS OPERATORS id_list OPERATORS'
+   'write_stmt : WRITE OPERATORS id_list OPERATORS'
    pass
-   
+
 def p_basic_return_stmt(p):
-   'return_stmt : KEYWORDS expr '
+   'return_stmt : RETURN expr '
    pass
-   
-   
-# Expressions List	
-	
+
+
+# Expressions List
+
 def p_expressions_expr(p):
     'expr : expr_prefix factor'
     pass
@@ -191,23 +192,25 @@ def p_expressions_mulop(p):
 
 # Complex Statemetns
 def p_complex_if_stmt(p):
-   'if_stmt : KEYWORDS OPERATORS cond OPERATORS decl stmt_list else_part KEYWORDS'
+   'if_stmt : IF OPERATORS cond OPERATORS decl stmt_list else_part ENDIF'
    pass
-   
+
 def p_complex_else_part(p):
-   '''else_part : KEYWORDS decl stmt_list
-   | empty'''
-   pass
-   
-def p_complex_cond(p):
-   '''cond : KEYWORDS decl stmt_list
+   '''else_part : ELSE decl stmt_list
    | empty'''
    pass
 
+def p_complex_cond(p):
+   '''cond : expr compop expr'''
+   pass
+
+def p_complex_compop(p):
+    '''compop : OPERATORS'''
+    pass
 # While statement
 
 def p_whilestatement_while_stmt(p):
-    'while_stmt : KEYWORDS OPERATORS cond OPERATORS decl stmt_list KEYWORDS'
+    'while_stmt : WHILE OPERATORS cond OPERATORS decl stmt_list ENDWHILE'
     pass
 
 # Empty
@@ -222,9 +225,19 @@ def p_error(p):
     print(p)
     print('Syntax error in input!')
 
+print("\nPARSER OUTPUT:\n");
+
+data = '''
+PROGRAM test
+BEGIN
+END
+'''
+
 # Build parser
 parser = yacc.yacc()
+result = parser.parse(data)
 
+print(result)
 while True:
     try:
         s = raw_input('calc > ')

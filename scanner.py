@@ -67,13 +67,27 @@ tokens = (
     'INTLITERAL',
     'STRINGLITERAL',
     'COMMENT',
-    'KEYWORDS',
     'OPERATORS',
     'SPACE',
     "IDENTIFIER",
 
     "PROGRAM",
+    "FUNCTION",
     "BEGIN",
+    "READ",
+    "WRITE",
+    "IF",
+    "ELSE",
+    "ENDIF",
+    "WHILE",
+    "ENDWHILE",
+    "CONTINUE",
+    "BREAK",
+    "RETURN",
+    "INT",
+    "VOID",
+    "STRING",
+    "FLOAT",
     "END"
 )
 
@@ -103,12 +117,6 @@ def t_STRINGLITERAL(t):
 def t_COMMENT(t):
     r'--.*'
     # Do nothing with spaces.
-
-# Definition for keywords
-#def t_KEYWORDS(t):
-#    r'(PROGRAM)|(BEGIN)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)|(END)'
-#    printToken("KEYWORD", t.value)
-#    return t
 
 # Definition for float literal
 def t_OPERATORS(t):
@@ -150,4 +158,4 @@ while True:
     tok = lexer.token()
     if not tok:
         break  # No more input
-    print(tok)
+    #print(tok)
