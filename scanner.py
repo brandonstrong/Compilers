@@ -70,7 +70,11 @@ tokens = (
     'KEYWORDS',
     'OPERATORS',
     'SPACE',
-    "IDENTIFIER"
+    "IDENTIFIER",
+
+    "PROGRAM",
+    "BEGIN",
+    "END"
 )
 
 def printToken(TNAME, TVAL):
@@ -101,10 +105,10 @@ def t_COMMENT(t):
     # Do nothing with spaces.
 
 # Definition for keywords
-def t_KEYWORDS(t):
-    r'(PROGRAM)|(BEGIN)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)|(END)'
-    printToken("KEYWORD", t.value)
-    return t
+#def t_KEYWORDS(t):
+#    r'(PROGRAM)|(BEGIN)|(FUNCTION)|(READ)|(WRITE)|(IF)|(ELSE)|(ENDIF)|(WHILE)|(ENDWHILE)|(CONTINUE)|(BREAK)|(RETURN)|(INT)|(VOID)|(STRING)|(FLOAT)|(END)'
+#    printToken("KEYWORD", t.value)
+#    return t
 
 # Definition for float literal
 def t_OPERATORS(t):
@@ -120,7 +124,11 @@ def t_SPACE(t):
 # Definition for variables
 def t_IDENTIFIER(t):
     r'\w+'
-    printToken("IDENTIFIER", t.value)
+    if t.value in tokens:
+        t.type = t.value
+        printToken(t.type, t.value)
+    else:
+        printToken("IDENTIFIER", t.value)
     return t
 
 # Error handling rule, This will tell us when an invalid token is found.
@@ -130,7 +138,6 @@ def t_error(t):
 
 # Build the lexer
 lexer = lex.lex()
-
 
 ##########################################
 #      Test out lexer
