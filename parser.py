@@ -17,7 +17,7 @@ def p_program_idea(p):
     pass
 
 def p_program_pgm_body(p):
-    'pgm_body : func_declarations'
+    'pgm_body : decl func_declarations'
     pass
 
 def p_program_decl(p):
@@ -57,7 +57,7 @@ def p_variables_id_list(p):
     pass
 
 def p_variables_id_tail(p):
-    '''id_tail : id id_tail
+    '''id_tail : ',' id id_tail
     | empty'''
     pass
 
