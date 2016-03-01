@@ -29,7 +29,7 @@ def p_program_decl(p):
 # Global String
 
 def p_gstring_string_decl(p):
-    'string_decl : STRING id OPERATORS str'
+    '''string_decl : STRING id OPERATORS str'''
     pass
 
 def p_gstring_str(p):
@@ -53,11 +53,11 @@ def p_variables_any_type(p):
     pass
 
 def p_variables_id_list(p):
-    'id_list : id id_tail'
+    '''id_list : id id_tail'''
     pass
 
 def p_variables_id_tail(p):
-    '''id_tail : ',' id id_tail
+    '''id_tail : OPERATORS id id_tail
     | empty'''
     pass
 
@@ -112,7 +112,7 @@ def p_statements_base_stmt(p):
     | return_stmt'''
     pass
 
-# Basic bitch statements
+# Basic statements
 def p_basic_assign_stmt(p):
    'assign_stmt : assign_expr'
    pass
@@ -225,20 +225,27 @@ def p_error(p):
     print(p)
     print('Syntax error in input!')
 
-print("\nPARSER OUTPUT:\n");
-
 data = '''
 PROGRAM test
 BEGIN
+FUNCTION VOID funk (FLOAT s)
+BEGIN
+STRING s = "fuck"
+INT x = asdf
+END
 END
 '''
 
 # Build parser
 parser = yacc.yacc()
-result = parser.parse(data)
 
+print("\nPARSER OUTPUT:\n");
+
+result = parser.parse(data)
 print(result)
-while True:
+
+print("\nGive customized input:")
+while False:
     try:
         s = raw_input('calc > ')
     except EOFError:

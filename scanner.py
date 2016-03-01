@@ -91,8 +91,10 @@ tokens = (
     "END"
 )
 
+literals = ['=']
+
 def printToken(TNAME, TVAL):
-    i = 0
+    i = 0 # This is placeholder so we can have the method. It does nothing important. Don't worry about it.
     #print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
 
 # Definition for float literal
