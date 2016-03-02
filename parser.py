@@ -1,9 +1,6 @@
 import ply.yacc as yacc
 from scanner import tokens
 import sys
-
-from Tools.scripts.treesync import raw_input
-
 from scanner import tokens
 
 # Program
@@ -243,12 +240,3 @@ print("\nPARSER OUTPUT:\n");
 result = parser.parse(data)
 print(result)
 
-print("\nGive customized input:")
-while False:
-    try:
-        s = raw_input('calc > ')
-    except EOFError:
-        break
-    if not s: continue
-    result = parser.parse(s)
-    print(result)
