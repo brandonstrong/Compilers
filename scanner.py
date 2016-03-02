@@ -67,7 +67,6 @@ tokens = (
     'INTLITERAL',
     'STRINGLITERAL',
     'COMMENT',
-    'OPERATORS',
     'SPACE',
     "IDENTIFIER",
 
@@ -88,10 +87,39 @@ tokens = (
     "VOID",
     "STRING",
     "FLOAT",
-    "END"
-)
+    "END",
 
-literals = ['=']
+    "ASSIGN",
+    "NOTEQUAL",
+    "LESSEQUAL",
+    "GREATEQUAL",
+    "GREATER",
+    "LESS",
+    "PLUS",
+    "MINUS",
+    "MULTIPLY",
+    "DIVIDE",
+    "EQUAL",
+    "LPAREN",
+    "RPAREN",
+    "SEMICOLON",
+    "COMMA"
+)
+t_ASSIGN = r':='
+t_NOTEQUAL = r'!='
+t_LESSEQUAL = r'<='
+t_GREATEQUAL = r'>='
+t_GREATER = r'>'
+t_LESS = r'<'
+t_PLUS = r'\+'
+t_MINUS = r'-'
+t_MULTIPLY = r'\*'
+t_DIVIDE = r'\/'
+t_EQUAL = r'='
+t_LPAREN = r'\('
+t_RPAREN = r'\)'
+t_SEMICOLON = r';'
+t_COMMA = r','
 
 def printToken(TNAME, TVAL):
     i = 0 # This is placeholder so we can have the method. It does nothing important. Don't worry about it.
@@ -119,12 +147,6 @@ def t_STRINGLITERAL(t):
 def t_COMMENT(t):
     r'--.*'
     # Do nothing with spaces.
-
-# Definition for float literal
-def t_OPERATORS(t):
-    r'(:=)|(!=)|(<=)|(>=)|(>)|(<)|(\+)|(-)|(\*)|(\/)|(=)|(\()|(\))|(;)|(,)'
-    printToken("OPERATOR", t.value)
-    return t
 
 # Handle spaces
 def t_SPACE(t):

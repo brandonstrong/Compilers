@@ -22,14 +22,14 @@ def p_program_pgm_body(p):
 
 def p_program_decl(p):
     '''decl : string_decl decl
-    | var_decl
+    | var_decl decl
     | empty'''
     pass
 
 # Global String
 
 def p_gstring_string_decl(p):
-    '''string_decl : STRING id OPERATORS str'''
+    '''string_decl : STRING id ASSIGN str SEMICOLON'''
     pass
 
 def p_gstring_str(p):
@@ -39,7 +39,7 @@ def p_gstring_str(p):
 # Variables
 
 def p_variables_var_decl(p):
-    'var_decl : var_type id_list'
+    'var_decl : var_type id_list SEMICOLON'
     pass
 
 def p_variables_var_type(p):
@@ -57,7 +57,7 @@ def p_variables_id_list(p):
     pass
 
 def p_variables_id_tail(p):
-    '''id_tail : OPERATORS id id_tail
+    '''id_tail : COMMA id id_tail
     | empty'''
     pass
 
@@ -73,7 +73,7 @@ def p_fparams_param_decl(p):
     pass
 
 def p_fparams_param_decl_tail(p):
-    '''param_decl_tail : param_decl param_decl_tail
+    '''param_decl_tail : COMMA param_decl param_decl_tail
     | empty'''
     pass
 
@@ -85,7 +85,7 @@ def p_fdecl_func_declarations(p):
     pass
 
 def p_fdecl_func_decl(p):
-    'func_decl : FUNCTION any_type id OPERATORS param_decl_list OPERATORS BEGIN func_body END'
+    'func_decl : FUNCTION any_type id LPAREN param_decl_list RPAREN BEGIN func_body END'
     pass
 
 def p_fdecl_func_body(p):
@@ -114,30 +114,30 @@ def p_statements_base_stmt(p):
 
 # Basic statements
 def p_basic_assign_stmt(p):
-   'assign_stmt : assign_expr'
+   'assign_stmt : assign_expr SEMICOLON'
    pass
 
 def p_basic_assign_expr(p):
-   'assign_expr : id OPERATORS expr'
+   'assign_expr : id ASSIGN expr'
    pass
 
 def p_basic_read_stmt(p):
-   'read_stmt : READ OPERATORS id_list OPERATORS'
+   'read_stmt : READ LPAREN id_list RPAREN SEMICOLON'
    pass
 
 def p_basic_write_stmt(p):
-   'write_stmt : WRITE OPERATORS id_list OPERATORS'
+   'write_stmt : WRITE LPAREN id_list RPAREN SEMICOLON'
    pass
 
 def p_basic_return_stmt(p):
-   'return_stmt : RETURN expr '
+   'return_stmt : RETURN expr SEMICOLON'
    pass
 
 
 # Expressions List
 
 def p_expressions_expr(p):
-    'expr : expr_prefix factor'
+    '''expr : expr_prefix factor'''
     pass
 
 def p_expressions_expr_prefix(p):
@@ -160,7 +160,7 @@ def p_expressions_postfix_expr(p):
     pass
 
 def p_expressions_call_expr(p):
-    'call_expr : id OPERATORS expr_list OPERATORS'
+    'call_expr : id LPAREN expr_list RPAREN'
     pass
 
 def p_expressions_expr_list(p):
@@ -169,30 +169,30 @@ def p_expressions_expr_list(p):
     pass
 
 def p_expressions_expr_list_tail(p):
-    '''expr_list_tail : OPERATORS OPERATORS expr expr_list_tail
+    '''expr_list_tail : COMMA expr expr_list_tail
     | empty'''
     pass
 
 def p_expressions_primary(p):
-    '''primary : OPERATORS expr OPERATORS
+    '''primary : LPAREN expr RPAREN
     | id
     | INTLITERAL
     | FLOATLITERAL'''
     pass
 
 def p_expressions_addop(p):
-    '''addop : OPERATORS OPERATORS
-    | OPERATORS'''
+    '''addop : PLUS
+    | MINUS'''
     pass
 
 def p_expressions_mulop(p):
-    '''mulop : OPERATORS OPERATORS
-    | OPERATORS'''
+    '''mulop : MULTIPLY
+    | DIVIDE'''
     pass
 
 # Complex Statemetns
 def p_complex_if_stmt(p):
-   'if_stmt : IF OPERATORS cond OPERATORS decl stmt_list else_part ENDIF'
+   'if_stmt : IF LPAREN cond RPAREN decl stmt_list else_part ENDIF'
    pass
 
 def p_complex_else_part(p):
@@ -205,12 +205,17 @@ def p_complex_cond(p):
    pass
 
 def p_complex_compop(p):
-    '''compop : OPERATORS'''
+    '''compop : LESS
+    | GREATER
+    | EQUAL
+    | NOTEQUAL
+    | LESSEQUAL
+    | GREATEQUAL'''
     pass
 # While statement
 
 def p_whilestatement_while_stmt(p):
-    'while_stmt : WHILE OPERATORS cond OPERATORS decl stmt_list ENDWHILE'
+    'while_stmt : WHILE LPAREN cond RPAREN decl stmt_list ENDWHILE'
     pass
 
 # Empty
@@ -225,14 +230,9 @@ def p_error(p):
     print(p)
     print('Syntax error in input!')
 
-data = '''
-PROGRAM test
+data='''
+PROGRAM pgm
 BEGIN
-FUNCTION VOID funk (FLOAT s)
-BEGIN
-STRING s = "fuck"
-INT x = asdf
-END
 END
 '''
 
