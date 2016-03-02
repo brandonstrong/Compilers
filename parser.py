@@ -3,8 +3,9 @@ from scanner import tokens
 import sys
 from scanner import tokens
 
-# Program
+accepted = True
 
+# Program
 def p_program_program(p):
     'program : PROGRAM id BEGIN pgm_body END'
     pass
@@ -216,16 +217,16 @@ def p_whilestatement_while_stmt(p):
     pass
 
 # Empty
-
 def p_empty(p):
     'empty :'
     pass
 
 # Error handling
-
 def p_error(p):
-    print(p)
-    print('Syntax error in input!')
+    global accepted
+    accepted = False
+    pass
+
 
 # Get input
 filename = sys.argv[1]
@@ -235,8 +236,9 @@ data = f.read()
 # Build parser
 parser = yacc.yacc()
 
-print("\nPARSER OUTPUT:\n");
-
 result = parser.parse(data)
-print(result)
+if(accepted):
+    print("Accepted")
+else:
+    print("Not Accepted")
 
