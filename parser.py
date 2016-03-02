@@ -240,5 +240,5 @@ result = parser.parse(data)
 if(accepted):
     print("Accepted")
 else:
-    print("Not Accepted")
+    print("Not accepted")
 
