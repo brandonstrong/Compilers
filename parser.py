@@ -230,11 +230,10 @@ def p_error(p):
     print(p)
     print('Syntax error in input!')
 
-data='''
-PROGRAM pgm
-BEGIN
-END
-'''
+# Get input
+filename = sys.argv[1]
+f = open(filename,"r")
+data = f.read()
 
 # Build parser
 parser = yacc.yacc()
