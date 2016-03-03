@@ -6,7 +6,7 @@ import sys, getopt
 #  CSCI-468 Compiler
 #  Group 0 - Brandon Strong, Sawyer Payne,
 #  and Matthew Gannon
-#  Project 1 - Create a scanner which will
+#  Part 1 - Create a scanner which will
 #  create tokens from the Little language
 #  to pass to the parser.
 #
@@ -16,46 +16,9 @@ import sys, getopt
 ##########################################
 #      Set up inputs
 ##########################################
-#filename = sys.argv[1]
-#f = open(filename,"r")
-#data = f.read()
-data = '''
-PROGRAM fibonacci
-BEGIN
-
-	STRING input := "Please input an integer number: ";
-	STRING space := " ";
-	STRING eol := "\n";
-
-	FUNCTION INT F (INT n)
-	BEGIN
-
-		IF (n > 2)
-		     RETURN F(n-1)+F(n-2);
-		ELSE
-			RETURN 1;
-	    ENDIF
-	END
-
-
-	FUNCTION VOID main ()
-	BEGIN
-		INT i, end, result;
-		WRITE(input);
-		READ(end);
-
-	i := 0;
-	WHILE (i != end)
-		result := F(i);
-		WRITE (i,space);
-		WRITE (result,eol);
-		i := i + 1;
-	ENDWHILE
-
-	END
-
-END
-'''
+filename = sys.argv[1]
+f = open(filename, "r")
+data = f.read()
 
 ##########################################
 #      Set up lex
@@ -123,7 +86,7 @@ t_COMMA = r','
 
 def printToken(TNAME, TVAL):
     i = 0 # This is placeholder so we can have the method. It does nothing important. Don't worry about it.
-    #print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
+    # print("Token Type: " + TNAME + "\nValue: " + TVAL.replace("\n", "\\n"))
 
 # Definition for float literal
 def t_FLOATLITERAL(t):
@@ -145,13 +108,14 @@ def t_STRINGLITERAL(t):
 
 # Definition for comment
 def t_COMMENT(t):
-    r'--.*'
+    r'''--.*'''
     # Do nothing with spaces.
 
 # Handle spaces
 def t_SPACE(t):
     r'\s'
     # Do nothing with spaces.
+
 
 # Definition for variables
 def t_IDENTIFIER(t):
@@ -162,6 +126,7 @@ def t_IDENTIFIER(t):
     else:
         printToken("IDENTIFIER", t.value)
     return t
+
 
 # Error handling rule, This will tell us when an invalid token is found.
 def t_error(t):
