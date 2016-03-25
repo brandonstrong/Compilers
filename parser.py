@@ -1,17 +1,56 @@
 import ply.yacc as yacc
 from scanner import tokens
+from collections import deque
+from collections import OrderedDict
 import sys
 from scanner import tokens
+
+class Symbol:
+    def __init__(self):
+        self.data = []
+
+    name = ""
+    type = ""
+    value = ""
+
+class Node:
+
+    def __init__(self):
+        self.data = []
+
+    children = []
+    symbols = []
+    scopeLevel = 0
+    parent = None
+    name = ""
+
+blockCount = 1
+currentScope = 0
+
+root = Node()
+root.scopeLevel = currentScope
+root.parent = root
+
+curnode = root
+cursymbol = Symbol()
+
+idnames = []
 
 accepted = True
 
 # Program
 def p_program_program(p):
     'program : PROGRAM id BEGIN pgm_body END'
+    global idnames
+    root.name = idnames.pop()
+    print(root.name)
     pass
+
 
 def p_program_idea(p):
     'id : IDENTIFIER'
+    global idnames
+    idnames.append(p.slice[1].value)
     pass
 
 def p_program_pgm_body(p):
@@ -43,6 +82,8 @@ def p_variables_var_decl(p):
 def p_variables_var_type(p):
     '''var_type : FLOAT
     | INT'''
+    global  cursymbol
+    cursymbol.type = p.slice[1].type
     pass
 
 def p_variables_any_type(p):
@@ -57,6 +98,13 @@ def p_variables_id_list(p):
 def p_variables_id_tail(p):
     '''id_tail : COMMA id id_tail
     | empty'''
+    global curnode
+    global cursymbol
+    global idnames
+    thissymbol = Symbol()
+    thissymbol.name = idnames.pop()
+    thissymbol.type = cursymbol.type
+    curnode.symbols = curnode.symbols + [thissymbol]
     pass
 
 # Function parameter list
@@ -84,6 +132,15 @@ def p_fdecl_func_declarations(p):
 
 def p_fdecl_func_decl(p):
     'func_decl : FUNCTION any_type id LPAREN param_decl_list RPAREN BEGIN func_body END'
+    global currentScope
+    currentScope += 1
+    thisnode = Node()
+    thisnode.scopeLevel = currentScope
+    global idnames
+    thisnode.name = idnames.pop()
+    curnode.children = curnode.children + [thisnode]
+    global curnode
+    curnode = thisnode
     pass
 
 def p_fdecl_func_body(p):
@@ -229,9 +286,17 @@ def p_error(p):
 
 
 # Get input
-filename = sys.argv[1]
-f = open(filename,"r")
-data = f.read()
+#filename = sys.argv[1]
+#f = open(filename,"r")
+#data = f.read()
+data = '''PROGRAM test BEGIN
+    INT x,y,z;
+    FLOAT a,b,c;
+	FUNCTION INT function1()
+    BEGIN
+    END
+END
+'''
 
 # Build parser
 parser = yacc.yacc()
