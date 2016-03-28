@@ -24,26 +24,32 @@ class Node:
     parent = None
     name = ""
 
-blockCount = 1
+# Block and scope level numeric trackers
+blockCount = 0
 currentScope = 0
 
+# Create root GLOBAL node
 root = Node()
 root.scopeLevel = currentScope
 root.parent = root
+root.name = "GLOBAL"
 
+# Set current node and symbol
 curnode = root
 cursymbol = Symbol()
 
+# Stack for keeping track of variable, function, and program names
 idnames = []
 
+# List for tracking function parameter variables
+paramSymbols = []
+
+# Boolean indication of whether program passed or not
 accepted = True
 
 # Program
 def p_program_program(p):
     'program : PROGRAM id BEGIN pgm_body END'
-    global idnames
-    root.name = idnames.pop()
-    print(root.name)
     pass
 
 
@@ -82,8 +88,13 @@ def p_variables_var_decl(p):
 def p_variables_var_type(p):
     '''var_type : FLOAT
     | INT'''
+
+    # Define global variables
     global  cursymbol
+
+    # Set cursymbol data type
     cursymbol.type = p.slice[1].type
+
     pass
 
 def p_variables_any_type(p):
@@ -98,13 +109,20 @@ def p_variables_id_list(p):
 def p_variables_id_tail(p):
     '''id_tail : COMMA id id_tail
     | empty'''
+
+    # Define global variables
     global curnode
     global cursymbol
     global idnames
+
+    # Create new symbol
     thissymbol = Symbol()
     thissymbol.name = idnames.pop()
     thissymbol.type = cursymbol.type
+
+    # Add symbol to curnode
     curnode.symbols = curnode.symbols + [thissymbol]
+
     pass
 
 # Function parameter list
@@ -112,10 +130,50 @@ def p_variables_id_tail(p):
 def p_fparams_param_decl_list(p):
     '''param_decl_list : param_decl param_decl_tail
     | empty'''
+
+    # Declare global variables
+    global currentScope
+    global paramSymbols
+    global curnode
+    global idnames
+
+    # Increment scope
+    currentScope += 1
+
+    # Create new node
+    thisnode = Node()
+    thisnode.scopeLevel = currentScope
+    thisnode.name = idnames.pop()
+    thisnode.parent = curnode
+
+    # Switch current node to this node
+    curnode.children = curnode.children + [thisnode]
+
+    # Set current node
+    curnode = thisnode
+
+    # Set current node symbols from parameters and reset paramsymbols
+    curnode.symbols = curnode.symbols + paramSymbols
+    paramSymbols = []
+
     pass
 
 def p_fparams_param_decl(p):
     'param_decl : var_type id'
+
+    # Define global variables
+    global paramSymbols
+    global cursymbol
+    global idnames
+
+    # Create new symbol
+    thissymbol = Symbol()
+    thissymbol.name = idnames.pop()
+    thissymbol.type = cursymbol.type
+
+    # Add symbol to paramSymbols
+    paramSymbols = paramSymbols + [thissymbol]
+
     pass
 
 def p_fparams_param_decl_tail(p):
@@ -132,15 +190,15 @@ def p_fdecl_func_declarations(p):
 
 def p_fdecl_func_decl(p):
     'func_decl : FUNCTION any_type id LPAREN param_decl_list RPAREN BEGIN func_body END'
+
+    # Declare global variables
     global currentScope
-    currentScope += 1
-    thisnode = Node()
-    thisnode.scopeLevel = currentScope
-    global idnames
-    thisnode.name = idnames.pop()
-    curnode.children = curnode.children + [thisnode]
     global curnode
-    curnode = thisnode
+
+    # Decrement scope and set curnode to parent
+    currentScope -= 1
+    curnode = curnode.parent
+
     pass
 
 def p_fdecl_func_body(p):
@@ -248,6 +306,15 @@ def p_expressions_mulop(p):
 # Complex Statemetns
 def p_complex_if_stmt(p):
    'if_stmt : IF LPAREN cond RPAREN decl stmt_list else_part ENDIF'
+
+   # Declare global variables
+   global curnode
+   global currentScope
+
+   # move current scope back one and decrease current node by one
+   curnode = curnode.parent
+   currentScope -= 1
+
    pass
 
 def p_complex_else_part(p):
@@ -257,6 +324,27 @@ def p_complex_else_part(p):
 
 def p_complex_cond(p):
    '''cond : expr compop expr'''
+
+   # Declare global variables
+   global blockCount
+   global currentScope
+   global curnode
+   global idnames
+
+   # Increment scope and block count
+   currentScope += 1
+   blockCount += 1
+
+   # Create new node
+   thisnode = Node()
+   thisnode.scopeLevel = currentScope
+   thisnode.name = "Block" + str(blockCount)
+   thisnode.parent = curnode
+
+   # Switch current node to this node
+   curnode.children = curnode.children + [thisnode]
+
+   curnode = thisnode
    pass
 
 def p_complex_compop(p):
@@ -271,6 +359,15 @@ def p_complex_compop(p):
 
 def p_whilestatement_while_stmt(p):
     'while_stmt : WHILE LPAREN cond RPAREN decl stmt_list ENDWHILE'
+
+    # Declare global variables
+    global curnode
+    global currentScope
+
+    # move current scope back one and decrease current node by one
+    curnode = curnode.parent
+    currentScope -= 1
+
     pass
 
 # Empty
@@ -284,24 +381,88 @@ def p_error(p):
     accepted = False
     pass
 
+# Print off symbol tables for scopes
+def treeTraversal(node):
+    # Print root node information
+    printinfo(node)
 
+    # Traverse the rest of the tree and print off information
+    for n in node.children:
+        treeTraversal(n)
+
+# Print information for node
+def printinfo(node):
+    # Print node name
+    print("Symbol table " + node.name)
+
+    # Iterate through each symbol and print it off
+    for s in node.symbols:
+        # Print symbol name and type
+        str = "name " + s.name + " type " + s.type
+
+        # Only print symbol value if it exists
+        if (s.value != ""):
+            str = str + " value " + s.value
+        print (str)
+    print()
 # Get input
 #filename = sys.argv[1]
 #f = open(filename,"r")
 #data = f.read()
-data = '''PROGRAM test BEGIN
-    INT x,y,z;
-    FLOAT a,b,c;
-	FUNCTION INT function1()
-    BEGIN
-    END
+data = '''
+PROGRAM fibonacci
+BEGIN
+
+	STRING dummy := "abcde";
+
+	INT i,result;
+
+
+	FUNCTION INT F (INT n)
+	BEGIN
+
+		IF (n > 2)
+			RETURN F(n-1)+F(n-2);
+		ENDIF
+		IF (n = 0)   --This is a comment
+			RETURN 0;
+        ELSE
+			RETURN 1;
+		ENDIF
+	END
+
+
+	FUNCTION VOID main ()
+	BEGIN
+
+    INT i, end, result;
+		READ(end);
+
+	i := 0;
+ 	WHILE (i != end)
+		result := F(i);
+		WRITE (i);
+		WRITE (result);
+		i := i + 1;
+	ENDWHILE
+
+
+	END
+
 END
+
 '''
 
-# Build parser
+# Build parser and parse data
 parser = yacc.yacc()
-
 result = parser.parse(data)
+
+# Reverse symbols in root
+root.symbols.reverse()
+
+# Traverse tree
+treeTraversal(root)
+
 if(accepted):
     print("Accepted")
 else:
