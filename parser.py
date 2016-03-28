@@ -387,7 +387,7 @@ def p_complex_else_part(p):
        # Create new node
        thisnode = Node()
        thisnode.scopeLevel = currentScope
-       thisnode.name = "Block" + str(blockCount)
+       thisnode.name = "BLOCK " + str(blockCount)
        thisnode.parent = curnode
 
        # Add thisnode to curnode children
@@ -460,12 +460,38 @@ def p_error(p):
 
 # Print off symbol tables for scopes
 def treeTraversal(node):
-    # Print root node information
-    printinfo(node)
+
+    global printstr
+
+    # Check for duplicate symbols
+    if(len(node.symbols) > 0):
+        checkDuplicates(node)
+
+    if(accepted):
+        # Print root node information
+        printinfo(node)
 
     # Traverse the rest of the tree and print off information
     for n in node.children:
         treeTraversal(n)
+
+# Check for duplicates in symbol table
+def checkDuplicates(node):
+
+    #Define global variables
+    global printstr
+    global accepted
+
+    # Check for any duplicates
+    for i in range(0, len(node.symbols)):
+        comparename = node.symbols[i].name
+        for j in range(i + 1, len(node.symbols)):
+            if(comparename == node.symbols[j].name):
+                printstr = "DECLARATION ERROR " + comparename
+                accepted = False
+                return
+
+
 
 # Print information for node
 def printinfo(node):
@@ -491,54 +517,9 @@ def printinfo(node):
     printstr = printstr + "\n"
 
 # Get input
-#filename = sys.argv[1]
-#f = open(filename,"r")
-#data = f.read()
-data = '''
-PROGRAM fibonacci
-BEGIN
-
-	STRING input := "Please input an integer number: ";
-	STRING space := " ";
-	STRING eol := "\n";
-
-	FUNCTION INT F (INT n)
-	BEGIN
-          INT n1;
-
-          n1 := n;
-
-		IF (n1 > 2)
-			RETURN F(n1-1)+F(n1-2);
-		ENDIF
-		IF (n1 = 0) --This is a comment
-			RETURN 0;
-		ELSE
-			RETURN 1;
-		ENDIF
-
-	END
-
-
-	FUNCTION VOID main ()
-	BEGIN
-		INT i, end, result;
-		WRITE(input);
-		READ(end);
-
-	i := 0;
-	WHILE (i != end)
-		result := F(i);
-		WRITE (i,space);
-		WRITE (result,eol);
-		i := i + 1;
-	ENDWHILE
-
-	END
-
-END
-
-'''
+filename = sys.argv[1]
+f = open(filename,"r")
+data = f.read()
 
 # Build parser and parse data
 parser = yacc.yacc()
@@ -547,8 +528,5 @@ result = parser.parse(data)
 # Traverse tree
 treeTraversal(root)
 
-if(accepted):
-    print(printstr)
-else:
-    print("Not accepted")
+print(printstr)
 
