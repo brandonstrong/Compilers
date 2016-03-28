@@ -44,9 +44,13 @@ idnames = []
 # List for tracking function parameter variables
 paramSymbols = []
 reverseSymbols = []
+reversPrevSize = 0
 
 # Boolean indication of whether program passed or not
 accepted = True
+
+# String that will be printed at end
+printstr = ""
 
 # Program
 def p_program_program(p):
@@ -122,10 +126,12 @@ def p_variables_id_list(p):
     # Define global variables
     global reverseSymbols
     global curnode
+    global reversPrevSize
 
     # Add reverse symbols to curnode symbols and clear reverse symbols
     reverseSymbols.reverse()
     curnode.symbols = curnode.symbols + reverseSymbols
+    reversPrevSize = len(reverseSymbols)
     reverseSymbols = []
 
     pass
@@ -263,10 +269,13 @@ def p_basic_read_stmt(p):
 
    # Declare global variable
    global idnames
+   global reversPrevSize
 
-   # Consume symbol from curnode
-   curnode.symbols.pop()
-
+   i = 0
+   while i < reversPrevSize:
+        i += 1
+        # Consume symbol from curnode
+        curnode.symbols.pop()
    pass
 
 def p_basic_write_stmt(p):
@@ -274,9 +283,13 @@ def p_basic_write_stmt(p):
 
    # Declare global variable
    global curnode
+   global reversPrevSize
 
-   # Consume symbol from curnode
-   curnode.symbols.pop()
+   i = 0
+   while i < reversPrevSize:
+        i += 1
+        # Consume symbol from curnode
+        curnode.symbols.pop()
 
    pass
 
@@ -456,19 +469,26 @@ def treeTraversal(node):
 
 # Print information for node
 def printinfo(node):
+
+    # Define  global variables
+    global printstr
+
     # Print node name
-    print("Symbol table " + node.name)
+    printstr = printstr + "Symbol Table " + node.name + "\n"
 
     # Iterate through each symbol and print it off
     for s in node.symbols:
+
         # Print symbol name and type
         str = "name " + s.name + " type " + s.type
 
         # Only print symbol value if it exists
         if (s.value != ""):
+            if(s.value == "\"\n\""):
+                s.value = "\"\\n\""
             str = str + " value " + s.value
-        print (str)
-    print()
+        printstr = printstr + str + "\n"
+    printstr = printstr + "\n"
 
 # Get input
 #filename = sys.argv[1]
@@ -478,39 +498,41 @@ data = '''
 PROGRAM fibonacci
 BEGIN
 
-	STRING dummy := "abcde";
-
-	INT i,result;
-
+	STRING input := "Please input an integer number: ";
+	STRING space := " ";
+	STRING eol := "\n";
 
 	FUNCTION INT F (INT n)
 	BEGIN
+          INT n1;
 
-		IF (n > 2)
-			RETURN F(n-1)+F(n-2);
+          n1 := n;
+
+		IF (n1 > 2)
+			RETURN F(n1-1)+F(n1-2);
 		ENDIF
-		IF (n = 0)   --This is a comment
+		IF (n1 = 0) --This is a comment
 			RETURN 0;
-        ELSE
+		ELSE
 			RETURN 1;
 		ENDIF
+
 	END
 
 
 	FUNCTION VOID main ()
 	BEGIN
-
-    INT i, end, result;
+		INT i, end, result;
+		WRITE(input);
 		READ(end);
 
 	i := 0;
- 	WHILE (i != end)
+	WHILE (i != end)
 		result := F(i);
-		WRITE (i);
-		WRITE (result);
+		WRITE (i,space);
+		WRITE (result,eol);
 		i := i + 1;
 	ENDWHILE
-
 
 	END
 
@@ -526,7 +548,7 @@ result = parser.parse(data)
 treeTraversal(root)
 
 if(accepted):
-    print("Accepted")
+    print(printstr)
 else:
     print("Not accepted")
 
