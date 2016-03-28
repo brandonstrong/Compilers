@@ -43,6 +43,7 @@ idnames = []
 
 # List for tracking function parameter variables
 paramSymbols = []
+reverseSymbols = []
 
 # Boolean indication of whether program passed or not
 accepted = True
@@ -77,6 +78,19 @@ def p_gstring_string_decl(p):
 
 def p_gstring_str(p):
     'str : STRINGLITERAL'
+
+    # Declare global variables
+    global curnode
+    global idnames
+
+    # Create new symbol
+    thissymbol = Symbol()
+    thissymbol.name = idnames.pop()
+    thissymbol.type = "STRING"
+    thissymbol.value = p.slice[1].value
+
+    # Add symbol to current node
+    curnode.symbols = curnode.symbols + [thissymbol]
     pass
 
 # Variables
@@ -90,7 +104,7 @@ def p_variables_var_type(p):
     | INT'''
 
     # Define global variables
-    global  cursymbol
+    global cursymbol
 
     # Set cursymbol data type
     cursymbol.type = p.slice[1].type
@@ -104,6 +118,16 @@ def p_variables_any_type(p):
 
 def p_variables_id_list(p):
     '''id_list : id id_tail'''
+
+    # Define global variables
+    global reverseSymbols
+    global curnode
+
+    # Add reverse symbols to curnode symbols and clear reverse symbols
+    reverseSymbols.reverse()
+    curnode.symbols = curnode.symbols + reverseSymbols
+    reverseSymbols = []
+
     pass
 
 def p_variables_id_tail(p):
@@ -111,7 +135,7 @@ def p_variables_id_tail(p):
     | empty'''
 
     # Define global variables
-    global curnode
+    global reverseSymbols
     global cursymbol
     global idnames
 
@@ -121,7 +145,7 @@ def p_variables_id_tail(p):
     thissymbol.type = cursymbol.type
 
     # Add symbol to curnode
-    curnode.symbols = curnode.symbols + [thissymbol]
+    reverseSymbols = reverseSymbols + [thissymbol]
 
     pass
 
@@ -236,10 +260,24 @@ def p_basic_assign_expr(p):
 
 def p_basic_read_stmt(p):
    'read_stmt : READ LPAREN id_list RPAREN SEMICOLON'
+
+   # Declare global variable
+   global idnames
+
+   # Consume symbol from curnode
+   curnode.symbols.pop()
+
    pass
 
 def p_basic_write_stmt(p):
    'write_stmt : WRITE LPAREN id_list RPAREN SEMICOLON'
+
+   # Declare global variable
+   global curnode
+
+   # Consume symbol from curnode
+   curnode.symbols.pop()
+
    pass
 
 def p_basic_return_stmt(p):
@@ -320,6 +358,31 @@ def p_complex_if_stmt(p):
 def p_complex_else_part(p):
    '''else_part : ELSE decl stmt_list
    | empty'''
+
+   if(len(p.slice) == 4):
+       # Declare global variables
+       global curnode
+       global blockCount
+       global currentScope
+
+       # Increment block count
+       blockCount += 1
+
+       # Switch current node to parent
+       curnode = curnode.parent
+
+       # Create new node
+       thisnode = Node()
+       thisnode.scopeLevel = currentScope
+       thisnode.name = "Block" + str(blockCount)
+       thisnode.parent = curnode
+
+       # Add thisnode to curnode children
+       curnode.children = curnode.children + [thisnode]
+
+       # Switch current node to this node
+       curnode = thisnode
+
    pass
 
 def p_complex_cond(p):
@@ -341,9 +404,10 @@ def p_complex_cond(p):
    thisnode.name = "Block" + str(blockCount)
    thisnode.parent = curnode
 
-   # Switch current node to this node
+   # Add this node to current node children
    curnode.children = curnode.children + [thisnode]
 
+    # Switch current node to this node
    curnode = thisnode
    pass
 
@@ -405,6 +469,7 @@ def printinfo(node):
             str = str + " value " + s.value
         print (str)
     print()
+
 # Get input
 #filename = sys.argv[1]
 #f = open(filename,"r")
@@ -456,9 +521,6 @@ END
 # Build parser and parse data
 parser = yacc.yacc()
 result = parser.parse(data)
-
-# Reverse symbols in root
-root.symbols.reverse()
 
 # Traverse tree
 treeTraversal(root)
