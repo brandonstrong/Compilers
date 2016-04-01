@@ -5,19 +5,28 @@ from collections import OrderedDict
 import sys
 from scanner import tokens
 
+
+# Class for variable or sym
 class Symbol:
+
+    # Initialize
     def __init__(self):
         self.data = []
 
+    # The values of each symbol or variable
     name = ""
     type = ""
     value = ""
 
+
+# Class for each node in the tree or scope
 class Node:
 
+    # Initialize
     def __init__(self):
         self.data = []
 
+    # List of children nodes and symbols
     children = []
     symbols = []
     scopeLevel = 0
@@ -58,6 +67,7 @@ def p_program_program(p):
     pass
 
 
+# Identifiers
 def p_program_idea(p):
     'id : IDENTIFIER'
     global idnames
@@ -97,8 +107,8 @@ def p_gstring_str(p):
     curnode.symbols = curnode.symbols + [thissymbol]
     pass
 
-# Variables
 
+# Variables
 def p_variables_var_decl(p):
     'var_decl : var_type id_list SEMICOLON'
     pass
@@ -112,7 +122,6 @@ def p_variables_var_type(p):
 
     # Set cursymbol data type
     cursymbol.type = p.slice[1].type
-
     pass
 
 def p_variables_any_type(p):
@@ -133,7 +142,6 @@ def p_variables_id_list(p):
     curnode.symbols = curnode.symbols + reverseSymbols
     reversPrevSize = len(reverseSymbols)
     reverseSymbols = []
-
     pass
 
 def p_variables_id_tail(p):
@@ -152,7 +160,6 @@ def p_variables_id_tail(p):
 
     # Add symbol to curnode
     reverseSymbols = reverseSymbols + [thissymbol]
-
     pass
 
 # Function parameter list
@@ -185,7 +192,6 @@ def p_fparams_param_decl_list(p):
     # Set current node symbols from parameters and reset paramsymbols
     curnode.symbols = curnode.symbols + paramSymbols
     paramSymbols = []
-
     pass
 
 def p_fparams_param_decl(p):
@@ -203,7 +209,6 @@ def p_fparams_param_decl(p):
 
     # Add symbol to paramSymbols
     paramSymbols = paramSymbols + [thissymbol]
-
     pass
 
 def p_fparams_param_decl_tail(p):
@@ -228,7 +233,6 @@ def p_fdecl_func_decl(p):
     # Decrement scope and set curnode to parent
     currentScope -= 1
     curnode = curnode.parent
-
     pass
 
 def p_fdecl_func_body(p):
@@ -290,7 +294,6 @@ def p_basic_write_stmt(p):
         i += 1
         # Consume symbol from curnode
         curnode.symbols.pop()
-
    pass
 
 def p_basic_return_stmt(p):
@@ -365,7 +368,6 @@ def p_complex_if_stmt(p):
    # move current scope back one and decrease current node by one
    curnode = curnode.parent
    currentScope -= 1
-
    pass
 
 def p_complex_else_part(p):
@@ -395,7 +397,6 @@ def p_complex_else_part(p):
 
        # Switch current node to this node
        curnode = thisnode
-
    pass
 
 def p_complex_cond(p):
@@ -414,7 +415,7 @@ def p_complex_cond(p):
    # Create new node
    thisnode = Node()
    thisnode.scopeLevel = currentScope
-   thisnode.name = "Block" + str(blockCount)
+   thisnode.name = "BLOCK " + str(blockCount)
    thisnode.parent = curnode
 
    # Add this node to current node children
@@ -432,8 +433,9 @@ def p_complex_compop(p):
     | LESSEQUAL
     | GREATEQUAL'''
     pass
-# While statement
 
+
+# While statement
 def p_whilestatement_while_stmt(p):
     'while_stmt : WHILE LPAREN cond RPAREN decl stmt_list ENDWHILE'
 
@@ -444,7 +446,6 @@ def p_whilestatement_while_stmt(p):
     # move current scope back one and decrease current node by one
     curnode = curnode.parent
     currentScope -= 1
-
     pass
 
 # Empty
@@ -500,7 +501,7 @@ def printinfo(node):
     global printstr
 
     # Print node name
-    printstr = printstr + "Symbol Table " + node.name + "\n"
+    printstr = printstr + "Symbol table " + node.name + "\n"
 
     # Iterate through each symbol and print it off
     for s in node.symbols:
@@ -528,5 +529,7 @@ result = parser.parse(data)
 # Traverse tree
 treeTraversal(root)
 
+# Remove trailing newlines and print out tables
+printstr = printstr.rstrip()
 print(printstr)
 
