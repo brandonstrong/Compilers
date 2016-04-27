@@ -18,6 +18,18 @@ class Symbol:
     type = ""
     value = ""
 
+class Mathnode:
+
+    #Initialize
+    def __init__(self):
+        self.data = []
+
+    # values of each node
+    name = ""
+    type = ""
+    rnode = None
+    lnode = None
+    parent = None
 
 # Class for each node in the tree or scope
 class Node:
@@ -61,6 +73,11 @@ accepted = True
 # String that will be printed at end
 printstr = ""
 
+# variables for IR
+irString = ""
+irlabel = 1
+regCounter = 1
+assignNode = None
 
 # Program
 def p_program_program(p):
@@ -72,6 +89,7 @@ def p_program_program(p):
 def p_program_idea(p):
     'id : IDENTIFIER'
     global idnames
+    global irString
     idnames.append(p.slice[1].value)
     pass
 
@@ -181,6 +199,7 @@ def p_fparams_param_decl_list(p):
     global paramSymbols
     global curnode
     global idnames
+    global irString
 
     # Increment scope
     currentScope += 1
@@ -200,6 +219,9 @@ def p_fparams_param_decl_list(p):
     # Set current node symbols from parameters and reset paramsymbols
     curnode.symbols = curnode.symbols + paramSymbols
     paramSymbols = []
+
+    # Add text to irString
+    irString += ";Label " + thisnode.name + "\n;Link"
     pass
 
 
@@ -282,6 +304,16 @@ def p_basic_assign_stmt(p):
 
 def p_basic_assign_expr(p):
     'assign_expr : id ASSIGN expr'
+
+    # declare global variable
+    global irString
+    global idnames
+    global regCounter
+
+    lastname = idnames.pop()
+    irString += '\n;STOREI $T' + str(regCounter) + " " + lastname
+    idnames += lastname
+    regCounter += 1
     pass
 
 
@@ -291,12 +323,14 @@ def p_basic_read_stmt(p):
     # Declare global variable
     global idnames
     global reversPrevSize
+    global irString
 
     i = 0
     while i < reversPrevSize:
         i += 1
         # Consume symbol from curnode
-        curnode.symbols.pop()
+        thissym = curnode.symbols.pop()
+        irString +="\n;READI " + thissym.name
     pass
 
 
@@ -306,12 +340,15 @@ def p_basic_write_stmt(p):
     # Declare global variable
     global curnode
     global reversPrevSize
+    global irString
+    global  idnames
 
     i = 0
     while i < reversPrevSize:
         i += 1
         # Consume symbol from curnode
-        curnode.symbols.pop()
+        thissym = curnode.symbols.pop()
+        irString += "\n;WRITEI " + thissym.name
     pass
 
 
@@ -371,18 +408,49 @@ def p_expressions_primary(p):
     | id
     | INTLITERAL
     | FLOATLITERAL'''
+
+    # Global variables
+    global irString
+    global regCounter
+    global assignNode
+    global idnames
+
+    # If float or int literal, store to register
+    stype = p.slice[1].type
+    if(stype == 'INTLITERAL' or stype == 'FLOATLITERAL'):
+        irString += " " + p.slice[1].value
+    elif(stype == 'id'):
+        lastname = idnames.pop()
+        irString += " " + lastname
+        idnames += lastname
+
     pass
 
 
 def p_expressions_addop(p):
     '''addop : PLUS
     | MINUS'''
+    global irString
+
+    if(p.slice[1].type == 'PLUS'):
+        irString += ' +'
+    else:
+        irString += ' -'
+
     pass
 
 
 def p_expressions_mulop(p):
     '''mulop : MULTIPLY
     | DIVIDE'''
+
+    global irString
+
+    if(p.slice[1].type == 'MULTIPLY'):
+        irString += ' *'
+    else:
+        irString += ' /'
+
     pass
 
 
@@ -438,6 +506,12 @@ def p_complex_cond(p):
     global currentScope
     global curnode
     global idnames
+    global irString
+    global irlabel
+
+    # Add label to output string
+    irString += "\n;LABEL label" + str(irlabel)
+    irlabel += 1
 
     # Increment scope and block count
     currentScope += 1
@@ -464,6 +538,33 @@ def p_complex_compop(p):
     | NOTEQUAL
     | LESSEQUAL
     | GREATEQUAL'''
+
+    # Global variables
+    global irString
+    global idnames
+    global regCounter
+    global irlabel
+
+    # Make comparison
+    lastname = idnames.pop()
+    operation = ""
+    if (p.slice[1].type == 'EQUAL'):
+        operation = "\n;EQI "
+    elif(p.slice[1].type == 'NOTEQUAL'):
+        operation = "\n;NEI"
+    elif (p.slice[1].type == 'GREATER'):
+        operation = "\n;GTI"
+    elif (p.slice[1].type == 'GREATEQUAL'):
+        operation = "\n;GEI"
+    elif (p.slice[1].type == 'LESS'):
+        operation = "\n;LTI"
+    elif (p.slice[1].type == 'LESSEQUAL'):
+        operation = "\n;LEI"
+
+    irString += operation + lastname + " $T" + str(regCounter) + " label" + str(irlabel)
+    regCounter += 1
+    idnames += lastname
+
     pass
 
 
@@ -553,9 +654,20 @@ def printinfo(node):
     printstr = printstr + "\n"
 
 # Get input
-filename = sys.argv[1]
-f = open(filename,"r")
-data = f.read()
+#filename = sys.argv[1]
+#f = open(filename,"r")
+#data = f.read()
+data = '''
+PROGRAM step4
+BEGIN
+	FUNCTION VOID main()
+	BEGIN
+
+		i := c + a*b + (a*b+c)/a + 20;
+	END
+END
+
+'''
 
 # Build parser and parse data
 parser = yacc.yacc()
@@ -566,5 +678,8 @@ treeTraversal(root)
 
 # Remove trailing newlines and print out tables
 printstr = printstr.rstrip()
-print(printstr)
+#print(printstr)
+
+# Print IR representation stuff
+print("\n\n" + irString)
 
