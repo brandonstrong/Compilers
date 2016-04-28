@@ -83,10 +83,9 @@ accepted = True
 printstr = ""
 
 # variables for IR
-irString = ""
+irString = ';IR code\n'
 irlabel = 1
 regCounter = 1
-assignNode = None
 exprstring = ""
 
 # Program
@@ -101,6 +100,7 @@ def p_program_idea(p):
     global idnames
     global irString
     idnames.append(p.slice[1].value)
+    p[0]=p[1]
     pass
 
 
@@ -314,16 +314,8 @@ def p_basic_assign_stmt(p):
 
 def p_basic_assign_expr(p):
     'assign_expr : id ASSIGN expr'
-
-    # declare global variable
     global irString
-    global idnames
-    global regCounter
-
-    lastname = idnames.pop()
-    irString += '\n;STOREI $T' + str(regCounter) + " " + lastname
-    idnames += lastname
-    regCounter += 1
+    irString += "\n;STOREI " + p[3] + " " + p[1]
     pass
 
 
@@ -370,35 +362,65 @@ def p_basic_return_stmt(p):
 # Expressions List
 def p_expressions_expr(p):
     '''expr : expr_prefix factor'''
-    p[0] = p[1] + p[2]
+    global irString
+    if p[1]:
+        nreg = nextReg()
+        p[0] = nreg
+        if p[1][-1] == '+':
+            irString += '\n;ADDI ' + p[1][:-1] + " " + p[2] + nreg
+        else:
+            irString += '\n;SUBI' + p[1][:-1] + " " + p[2] + nreg
+    else:
+        p[0] = p[2]
+
     pass
 
 
 def p_expressions_expr_prefix(p):
     '''expr_prefix : expr_prefix factor addop
     | empty'''
-    if(len(p.slice) > 2):
-        p[0] = p[2] + p[3]
+    global irString
+    if len(p.slice) > 2:
+        if p[1]:
+            nreg = nextReg()
+            if p[1][-1] == '+':
+                irString += '\n;ADDI ' + p[1][:-1] + " " + p[2] + nreg
+                p[0] = nreg + '+'
+            else:
+                irString += '\n;SUBI ' + p[1][:-1] + " " + p[2] + nreg
+                p[0] = nreg + '-'
+        else:
+            p[0] = p[2] + p[3]
+
     pass
 
 
 def p_expressions_factor(p):
     'factor : factor_prefix postfix_expr'
-    if(p[1] == None):
-        p[0] = p[2]
+    global irString
+    if p[1]:
+        nreg = nextReg()
+        p[0] = nreg
+        if p[1][-1] == "*":
+            irString += "\n;MULTI " + p[1][:-1] + " " + p[2]  + nreg
+        else:
+            irString += "\n;DIVI " + p[1][:-1] + " " + p[2] + nreg
+
     else:
-        p[0] = p[1] + p[2]
+        p[0] = p[2]
+
     pass
 
 
 def p_expressions_factor_prefix(p):
     '''factor_prefix : factor_prefix postfix_expr mulop
     | empty'''
-    if(len(p.slice) > 2):
-        if(p[2] == None):
-            p[0] = p[3]
-        else:
+    if len(p.slice) > 2:
+        if p[2]:
             p[0] = p[2] + p[3]
+        else:
+            p[0] = p[3]
+
     pass
 
 
@@ -433,24 +455,22 @@ def p_expressions_primary(p):
     | FLOATLITERAL'''
 
     # Global variables
-    global irString
-    global regCounter
     global assignNode
     global idnames
+    global irString
 
     # If float or int literal, store to register
     stype = p.slice[1].type
     if(stype == 'INTLITERAL' or stype == 'FLOATLITERAL'):
-        irString += " " + p.slice[1].value
-        p[0] = p[1]
+        nreg = nextReg()
+        irString += "\n;STOREI " + p[1] + nreg
+        p[0] = nreg
     elif(stype == 'id'):
-        lastname = idnames.pop()
-        irString += " " + lastname
-        idnames += lastname
+        p[0] = p[1]
     elif(len(p.slice) == 4):
-        p[0] = p[1] + p[2] + p[3]
+        p[0] = p[2]
     pass
-
+    #primary
 
 def p_expressions_addop(p):
     '''addop : PLUS
@@ -564,14 +584,7 @@ def p_complex_compop(p):
     | LESSEQUAL
     | GREATEQUAL'''
 
-    # Global variables
-    global irString
-    global idnames
-    global regCounter
-    global irlabel
-
     # Make comparison
-    lastname = idnames.pop()
     operation = ""
     if (p.slice[1].type == 'EQUAL'):
         operation = "\n;EQI "
@@ -586,9 +599,6 @@ def p_complex_compop(p):
     elif (p.slice[1].type == 'LESSEQUAL'):
         operation = "\n;LEI"
 
-    irString += operation + lastname + " $T" + str(regCounter) + " label" + str(irlabel)
-    regCounter += 1
-    idnames += lastname
 
     pass
 
@@ -619,6 +629,11 @@ def p_error(p):
     accepted = False
     pass
 
+def nextReg():
+    global regCounter
+    temp = regCounter
+    regCounter += 1
+    return " $T" + str(temp)
 
 # Print off symbol tables for scopes
 def treeTraversal(node):
@@ -682,12 +697,57 @@ def printinfo(node):
 #filename = sys.argv[1]
 #f = open(filename,"r")
 #data = f.read()
-data = '''
-PROGRAM step4
+data = '''PROGRAM expr
 BEGIN
+
+	INT a,b,c,d;
+	FLOAT x,y,z,t;
+	STRING newline := "\n";
+
 	FUNCTION VOID main()
 	BEGIN
-		i := 1 + 2 * (3 + 4);
+		a := 1;
+		b := 2;
+		c := 10;
+		d := 20;
+
+		WRITE (a, newline);
+		WRITE (b, newline);
+		WRITE (c, newline);
+		WRITE (d, newline);
+		a := a + b;
+		WRITE (a, newline);
+		b := a * c;
+		WRITE (b, newline);
+		c := 0 - a + b;
+		WRITE (c, newline);
+		d := 0 - d;
+		WRITE (d, newline);
+		a := (a+b)*(d+c)-(a+b+c+d)/a;
+		WRITE (a, newline);
+
+		a := a + 10;
+		WRITE (a, newline);
+		b := b + a + 10;
+		WRITE (b, newline);
+		c := 0 - 10;
+		WRITE (c, newline);
+		x := 1.0;
+		y := 2.0;
+		z := 3.14159;
+		WRITE (x, newline);
+		WRITE (z, newline);
+		WRITE (y, newline);
+		x := z/2.0;
+		y := z/y;
+		WRITE (x, newline);
+		WRITE (y, newline);
+		t := (x+y+z)/z;
+		WRITE (t, newline);
+		t := t*t;
+		WRITE (t, newline);
+		t := (t+z+t+t/2.0+z/4.0+z/5.0+z/6.0+z/7.0);
+		WRITE (t, newline);
 	END
 END
 
@@ -705,5 +765,5 @@ printstr = printstr.rstrip()
 #print(printstr)
 
 # Print IR representation stuff
-print("\n\n" + irString)
+print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
 
