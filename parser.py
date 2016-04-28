@@ -384,7 +384,10 @@ def p_expressions_expr_prefix(p):
 
 def p_expressions_factor(p):
     'factor : factor_prefix postfix_expr'
-    p[0] = p[2]
+    if(p[1] == None):
+        p[0] = p[2]
+    else:
+        p[0] = p[1] + p[2]
     pass
 
 
