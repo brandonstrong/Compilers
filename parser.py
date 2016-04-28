@@ -31,6 +31,15 @@ class Mathnode:
     lnode = None
     parent = None
 
+class OpNode:
+    def __init__(self, type, children=None, leaf=None):
+        self.type = type
+        if children:
+            self.children = children
+        else:
+            self.children = []
+        self.leaf = leaf
+
 # Class for each node in the tree or scope
 class Node:
 
@@ -78,6 +87,7 @@ irString = ""
 irlabel = 1
 regCounter = 1
 assignNode = None
+exprstring = ""
 
 # Program
 def p_program_program(p):
@@ -341,7 +351,7 @@ def p_basic_write_stmt(p):
     global curnode
     global reversPrevSize
     global irString
-    global  idnames
+    global idnames
 
     i = 0
     while i < reversPrevSize:
@@ -360,29 +370,39 @@ def p_basic_return_stmt(p):
 # Expressions List
 def p_expressions_expr(p):
     '''expr : expr_prefix factor'''
+    p[0] = p[1] + p[2]
     pass
 
 
 def p_expressions_expr_prefix(p):
     '''expr_prefix : expr_prefix factor addop
     | empty'''
+    if(len(p.slice) > 2):
+        p[0] = p[2] + p[3]
     pass
 
 
 def p_expressions_factor(p):
     'factor : factor_prefix postfix_expr'
+    p[0] = p[2]
     pass
 
 
 def p_expressions_factor_prefix(p):
     '''factor_prefix : factor_prefix postfix_expr mulop
     | empty'''
+    if(len(p.slice) > 2):
+        if(p[2] == None):
+            p[0] = p[3]
+        else:
+            p[0] = p[2] + p[3]
     pass
 
 
 def p_expressions_postfix_expr(p):
     '''postfix_expr : primary
     | call_expr'''
+    p[0] = p[1]
     pass
 
 
@@ -419,24 +439,26 @@ def p_expressions_primary(p):
     stype = p.slice[1].type
     if(stype == 'INTLITERAL' or stype == 'FLOATLITERAL'):
         irString += " " + p.slice[1].value
+        p[0] = p[1]
     elif(stype == 'id'):
         lastname = idnames.pop()
         irString += " " + lastname
         idnames += lastname
-
+    elif(len(p.slice) == 4):
+        p[0] = p[1] + p[2] + p[3]
     pass
 
 
 def p_expressions_addop(p):
     '''addop : PLUS
     | MINUS'''
-    global irString
+    global exprstring
 
     if(p.slice[1].type == 'PLUS'):
-        irString += ' +'
+        exprstring += ' +'
     else:
-        irString += ' -'
-
+        exprstring += ' -'
+    p[0] = p[1]
     pass
 
 
@@ -444,13 +466,13 @@ def p_expressions_mulop(p):
     '''mulop : MULTIPLY
     | DIVIDE'''
 
-    global irString
+    global exprstring
 
     if(p.slice[1].type == 'MULTIPLY'):
-        irString += ' *'
+        exprstring += ' *'
     else:
-        irString += ' /'
-
+        exprstring += ' /'
+    p[0] = p[1]
     pass
 
 
@@ -662,8 +684,7 @@ PROGRAM step4
 BEGIN
 	FUNCTION VOID main()
 	BEGIN
-
-		i := c + a*b + (a*b+c)/a + 20;
+		i := 1 + 2 * (3 + 4);
 	END
 END
 
