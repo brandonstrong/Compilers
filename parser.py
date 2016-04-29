@@ -78,6 +78,102 @@ irlabel = 1
 regCounter = 1
 optype = ''
 opList = []
+registerNums = 0
+
+def newRegs(oldreg):
+    global registerNums
+    registerNums = registerNums + 1
+    registerName ="r" + registerNums
+
+    return registerName
+
+
+def convert():
+    global irString
+    #assemble = [irString.replace(";", "") for clean in irString.split('\n') if irString.replace()]
+    # myOp = OpNode()
+
+    # Vars and Strs must precede all codes and labels in tiny assembly
+    # The only ops on string constants is sys writes sid
+    # strings can include \n for end-of-line
+
+    myVars = []
+    myStrs = []
+    regDict ={}
+
+    assembled = "fuck this"
+
+    # new temporary numbers for Tiny ASS
+
+
+    global opList
+# need to change all temporary variables into registers.
+
+    for thisOp in opList:
+
+        # integer addition, reg = reg + op1
+        if thisOp.name == 'ADDI':
+            i = 10
+        #
+        elif thisOp.name == 'ADDF':
+            i = 10
+        elif thisOp.name == 'SUBI':
+            i = 10
+
+        elif thisOp.name == 'SUBF':
+            i = 10
+
+        elif thisOp.name == 'MULTI':
+            i = 10
+
+        elif thisOp.name == 'MULTF':
+            i = 10
+
+        elif thisOp.name == 'DIVI':
+            i = 10
+        elif thisOp.name == 'DIVF':
+            i = 10
+        elif thisOp.name == 'STOREI':
+            i = 10
+
+        elif thisOp.name == 'STOREF':
+            i = 10
+        elif thisOp.name == 'GT':
+            i = 10
+
+        elif thisOp.name == 'GE':
+            i = 10
+        elif thisOp.name == 'LT':
+            i = 10
+
+        elif thisOp.name == 'LE':
+            i = 10
+        elif thisOp.name == 'NE':
+            i = 10
+
+        elif thisOp.name == 'EQ':
+            i = 10
+
+        elif thisOp.name == 'JUMP':
+            i = 10
+        elif thisOp.name == 'LABEL':
+            i = 10
+
+        elif thisOp.name == 'READI':
+            i = 10
+
+        elif thisOp.name == 'READF':
+            i = 10
+
+        elif thisOp.name == 'WRITEI':
+            i = 10
+
+        elif thisOp.name == 'WRITEF':
+            i = 10
+
+    return assembled
+
+
 
 # Program
 def p_program_program(p):
@@ -334,7 +430,7 @@ def p_basic_read_stmt(p):
         # Consume symbol from curnode
         thissym = curnode.symbols.pop()
         irString +='\n;READ' + optype + ' ' + thissym.name
-        opList += [OpNode('READ' + optype, '', '', thissym.name)]
+        opList += [OpNode('READ' + optype, '', '', thissym.name, '', '')]
     pass
 
 
@@ -743,7 +839,9 @@ treeTraversal(root)
 printstr = printstr.rstrip()
 #print(printstr)
 
-print(opList)
+
+
+print(convert())
 
 # Print IR representation stuff
 print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
