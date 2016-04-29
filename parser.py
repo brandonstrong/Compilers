@@ -18,27 +18,17 @@ class Symbol:
     type = ""
     value = ""
 
-class Mathnode:
-
-    #Initialize
-    def __init__(self):
-        self.data = []
-
-    # values of each node
-    name = ""
-    type = ""
-    rnode = None
-    lnode = None
-    parent = None
-
+# IR Operation node
 class OpNode:
-    def __init__(self, type, children=None, leaf=None):
-        self.type = type
-        if children:
-            self.children = children
-        else:
-            self.children = []
-        self.leaf = leaf
+    def __init__(self, name, op1, op2, result, label, string):
+        self.data = []
+        self.name = name
+        self.op1 = op1
+        self.op2 = op2
+        self.result = result
+        self.label = label
+        self.string = string
+
 
 # Class for each node in the tree or scope
 class Node:
@@ -86,7 +76,8 @@ printstr = ""
 irString = ';IR code\n'
 irlabel = 1
 regCounter = 1
-exprstring = ""
+optype = ''
+opList = []
 
 # Program
 def p_program_program(p):
@@ -98,7 +89,6 @@ def p_program_program(p):
 def p_program_idea(p):
     'id : IDENTIFIER'
     global idnames
-    global irString
     idnames.append(p.slice[1].value)
     p[0]=p[1]
     pass
@@ -128,7 +118,8 @@ def p_gstring_str(p):
     # Declare global variables
     global curnode
     global idnames
-
+    global optype
+    optype = 'S'
     # Create new symbol
     thissymbol = Symbol()
     thissymbol.name = idnames.pop()
@@ -192,7 +183,11 @@ def p_variables_id_tail(p):
     # Create new symbol
     thissymbol = Symbol()
     thissymbol.name = idnames.pop()
-    thissymbol.type = cursymbol.type
+    if thissymbol.name == 'newline':
+        thissymbol.type = 'STRING'
+        thissymbol.value = '\n'
+    else:
+        thissymbol.type = cursymbol.type
 
     # Add symbol to curnode
     reverseSymbols = reverseSymbols + [thissymbol]
@@ -210,6 +205,7 @@ def p_fparams_param_decl_list(p):
     global curnode
     global idnames
     global irString
+    global opList
 
     # Increment scope
     currentScope += 1
@@ -231,7 +227,8 @@ def p_fparams_param_decl_list(p):
     paramSymbols = []
 
     # Add text to irString
-    irString += ";Label " + thisnode.name + "\n;Link"
+    irString += ";LABEL " + thisnode.name + "\n;Link"
+    opList += [OpNode('LABEL', '', '', '', '', thisnode.name)]
     pass
 
 
@@ -315,7 +312,9 @@ def p_basic_assign_stmt(p):
 def p_basic_assign_expr(p):
     'assign_expr : id ASSIGN expr'
     global irString
-    irString += "\n;STOREI " + p[3] + " " + p[1]
+    global opList
+    irString += '\n;STORE' + optype + ' ' +  p[3] + " " + p[1]
+    opList += [OpNode('STORE' + optype, p[3], '', p[1], '', '')]
     pass
 
 
@@ -326,13 +325,16 @@ def p_basic_read_stmt(p):
     global idnames
     global reversPrevSize
     global irString
+    global optype
+    global opList
 
     i = 0
     while i < reversPrevSize:
         i += 1
         # Consume symbol from curnode
         thissym = curnode.symbols.pop()
-        irString +="\n;READI " + thissym.name
+        irString +='\n;READ' + optype + ' ' + thissym.name
+        opList += [OpNode('READ' + optype, '', '', thissym.name)]
     pass
 
 
@@ -344,13 +346,24 @@ def p_basic_write_stmt(p):
     global reversPrevSize
     global irString
     global idnames
+    global optype
+    global opList
 
     i = 0
+    writestr = ''
+    minilist = []
     while i < reversPrevSize:
         i += 1
         # Consume symbol from curnode
         thissym = curnode.symbols.pop()
-        irString += "\n;WRITEI " + thissym.name
+        if thissym.type == 'STRING':
+            writestr = '\n;WRITES ' + thissym.name + writestr
+            minilist = [OpNode('WRITES', '', '', thissym.name, '', '')] + minilist
+        else:
+            writestr = '\n;WRITE' + optype + ' ' + thissym.name + writestr
+            minilist = [OpNode('WRITE' + optype, '', '', thissym.name, '', '')] + minilist
+    irString += writestr
+    opList += minilist
     pass
 
 
@@ -363,13 +376,17 @@ def p_basic_return_stmt(p):
 def p_expressions_expr(p):
     '''expr : expr_prefix factor'''
     global irString
+    global optype
+    global opList
     if p[1]:
         nreg = nextReg()
         p[0] = nreg
         if p[1][-1] == '+':
-            irString += '\n;ADDI ' + p[1][:-1] + " " + p[2] + nreg
+            irString += '\n;ADD' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+            opList += [OpNode('ADD' + optype, p[1][:-1], p[2], nreg, '', '')]
         else:
-            irString += '\n;SUBI' + p[1][:-1] + " " + p[2] + nreg
+            irString += '\n;SUB' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+            opList += [OpNode('SUB' + optype, p[1][:-1], p[2], nreg, '', '')]
     else:
         p[0] = p[2]
 
@@ -380,15 +397,19 @@ def p_expressions_expr_prefix(p):
     '''expr_prefix : expr_prefix factor addop
     | empty'''
     global irString
+    global  optype
+    global opList
     if len(p.slice) > 2:
         if p[1]:
             nreg = nextReg()
             if p[1][-1] == '+':
-                irString += '\n;ADDI ' + p[1][:-1] + " " + p[2] + nreg
-                p[0] = nreg + '+'
+                irString += '\n;ADD' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+                opList += [OpNode('ADD' + optype, p[1][:-1], p[2], nreg, '', '')]
+                p[0] = nreg + p[3]
             else:
-                irString += '\n;SUBI ' + p[1][:-1] + " " + p[2] + nreg
-                p[0] = nreg + '-'
+                irString += '\n;SUB' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+                opList += [OpNode('SUB' + optype, p[1][:-1], p[2], nreg, '', '')]
+                p[0] = nreg + p[3]
         else:
             p[0] = p[2] + p[3]
 
@@ -398,13 +419,17 @@ def p_expressions_expr_prefix(p):
 def p_expressions_factor(p):
     'factor : factor_prefix postfix_expr'
     global irString
+    global optype
+    global opList
     if p[1]:
         nreg = nextReg()
         p[0] = nreg
         if p[1][-1] == "*":
-            irString += "\n;MULTI " + p[1][:-1] + " " + p[2]  + nreg
+            irString += '\n;MULT' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+            opList += [OpNode('MULT' + optype, p[1][:-1], p[2], nreg, '', '')]
         else:
-            irString += "\n;DIVI " + p[1][:-1] + " " + p[2] + nreg
+            irString += '\n;DIV' + optype + ' ' + p[1][:-1] + " " + p[2] + nreg
+            opList += [OpNode('DIV' + optype, p[1][:-1], p[2], nreg, '', '')]
 
     else:
         p[0] = p[2]
@@ -458,13 +483,20 @@ def p_expressions_primary(p):
     global assignNode
     global idnames
     global irString
+    global optype
+    global opList
 
     # If float or int literal, store to register
     stype = p.slice[1].type
-    if(stype == 'INTLITERAL' or stype == 'FLOATLITERAL'):
+    if stype == 'INTLITERAL' or stype == 'FLOATLITERAL' :
         nreg = nextReg()
         irString += "\n;STOREI " + p[1] + nreg
+        opList += [OpNode('STOREI', p[1], '', nreg, '', '')]
         p[0] = nreg
+        if stype == 'INTLITERAL':
+            optype = 'I'
+        else:
+            optype = 'F'
     elif(stype == 'id'):
         p[0] = p[1]
     elif(len(p.slice) == 4):
@@ -475,12 +507,6 @@ def p_expressions_primary(p):
 def p_expressions_addop(p):
     '''addop : PLUS
     | MINUS'''
-    global exprstring
-
-    if(p.slice[1].type == 'PLUS'):
-        exprstring += ' +'
-    else:
-        exprstring += ' -'
     p[0] = p[1]
     pass
 
@@ -488,13 +514,6 @@ def p_expressions_addop(p):
 def p_expressions_mulop(p):
     '''mulop : MULTIPLY
     | DIVIDE'''
-
-    global exprstring
-
-    if(p.slice[1].type == 'MULTIPLY'):
-        exprstring += ' *'
-    else:
-        exprstring += ' /'
     p[0] = p[1]
     pass
 
@@ -553,9 +572,11 @@ def p_complex_cond(p):
     global idnames
     global irString
     global irlabel
+    global opList
 
     # Add label to output string
-    irString += "\n;LABEL label" + str(irlabel)
+    irString += '\n;LABEL label' + str(irlabel)
+    opList += [OpNode('LABEL', '', '', '', '', 'label' + str(irlabel))]
     irlabel += 1
 
     # Increment scope and block count
@@ -706,51 +727,9 @@ BEGIN
 
 	FUNCTION VOID main()
 	BEGIN
-		a := 1;
-		b := 2;
-		c := 10;
-		d := 20;
-
-		WRITE (a, newline);
-		WRITE (b, newline);
-		WRITE (c, newline);
-		WRITE (d, newline);
-		a := a + b;
-		WRITE (a, newline);
-		b := a * c;
-		WRITE (b, newline);
-		c := 0 - a + b;
-		WRITE (c, newline);
-		d := 0 - d;
-		WRITE (d, newline);
-		a := (a+b)*(d+c)-(a+b+c+d)/a;
-		WRITE (a, newline);
-
-		a := a + 10;
-		WRITE (a, newline);
-		b := b + a + 10;
-		WRITE (b, newline);
-		c := 0 - 10;
-		WRITE (c, newline);
-		x := 1.0;
-		y := 2.0;
-		z := 3.14159;
-		WRITE (x, newline);
-		WRITE (z, newline);
-		WRITE (y, newline);
-		x := z/2.0;
-		y := z/y;
-		WRITE (x, newline);
-		WRITE (y, newline);
-		t := (x+y+z)/z;
-		WRITE (t, newline);
-		t := t*t;
-		WRITE (t, newline);
-		t := (t+z+t+t/2.0+z/4.0+z/5.0+z/6.0+z/7.0);
 		WRITE (t, newline);
 	END
 END
-
 '''
 
 # Build parser and parse data
@@ -763,6 +742,8 @@ treeTraversal(root)
 # Remove trailing newlines and print out tables
 printstr = printstr.rstrip()
 #print(printstr)
+
+print(opList)
 
 # Print IR representation stuff
 print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
