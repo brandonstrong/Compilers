@@ -83,8 +83,9 @@ registerNums = 0
 
 def newRegs():
     global registerNums
+
+    registerName ="r" + str(registerNums)
     registerNums = registerNums + 1
-    registerName ="r" + registerNums
 
     return registerName
 
@@ -102,6 +103,7 @@ def convert():
     myVars = []
     myStrs = {}
     varDict ={}
+    tempDict = {}
 
     def checkVars():
         if thisOp.op1:
@@ -138,127 +140,202 @@ def convert():
 
         tempReg = ""
         tempReg2 = ""
+        thisOp.op1 = thisOp.op1.strip()
+        thisOp.op2 = thisOp.op2.strip()
+        thisOp.result = thisOp.result.strip()
 
+        if thisOp.op1:
+            if thisOp.op1[0] == '$':
+
+                if thisOp.op1 not in tempDict:
+                    tempReg = newRegs()
+                    tempDict[thisOp.op1] = tempReg
+                    thisOp.op1 = tempReg
+                else:
+                    thisOp.op1 = tempDict[thisOp.op1]
+
+        if thisOp.op2:
+
+            if thisOp.op2[0] == '$':
+
+                if thisOp.op2 not in tempDict:
+                    tempReg = newRegs()
+                    tempDict[thisOp.op2] = tempReg
+                    thisOp.op2 = tempReg
+                else:
+                    thisOp.op2 = tempDict[thisOp.op2]
+        if thisOp.result:
+
+            if thisOp.result[0] == '$':
+
+                if thisOp.result not in tempDict:
+                    tempReg = newRegs()
+                    tempDict[thisOp.result] = tempReg
+                    thisOp.result = tempReg
+                else:
+                    thisOp.result = tempDict[thisOp.result]
 
         # IR addi Op1 Op2 Result (int add)
         # Tiny addi opmrl reg, (integer addition), reg = reg + op1
         if thisOp.name == 'ADDI':
-            if thisOp.op1[0] == '$':
-                if thisOp.op1 == '' not in varDict:
-                    tempReg = newRegs()
-                    varDict[thisOp.op1] = tempReg
-            elif thisOp.op1 not in myVars:
-                myVars += thisOp.op1
+
+            # if thisOp.op1[0] == '$':
+            #    if thisOp.op1 == '' not in varDict:
+            #        tempReg = newRegs()
+            #        varDict[thisOp.op1] = tempReg
+            # elif thisOp.op1
+            # elif thisOp.op1 not in myVars:
+            #    myVars += thisOp.op1
+            #
+            #
+            # if thisOp.op2[0] == '$':
+            #    if thisOp.op2 not in varDict:
+            #        tempReg = thisOp.op2
 
 
-            if thisOp.op2[0] == '$':
-                if thisOp.op2 not in varDict:
-                    tempReg = thisOp.op2
 
-
-
-
-           # assembly = "move " + thisOp.op1 +
+            tempReg =  newRegs()
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg +"\naddi " + tempReg + " " + thisOp.op2
 
         # IR addf Op1 Op2 Result (floating point add)
         # Tiny addr opmrl reg (real/float add), reg = reg + op1
         elif thisOp.name == 'ADDF':
-            i = 10
+            tempReg = newRegs()
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\naddf " + tempReg + " " + thisOp.op2
 
         # IR subi Op1 Op2  Result (int sub)
         # Tiny subi opmrl reg (int sub), reg = reg - op1
         elif thisOp.name == 'SUBI':
-            i = 10
+            tempReg = newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubi " + tempReg + " " + thisOp.op1
 
         # IR subf Op1 Op2 Result (float subtract) Result = op1/op2
         # Tiny subr opmrl reg (real/float sub), reg = reg - op1
         elif thisOp.name == 'SUBF':
-            i = 10
+            tempReg = newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubr " + tempReg + " " + thisOp.op1
 
         # IR multi op1 op2 result (int multiply)
         # Tiny muli opmrl reg (int mult), reg = reg * op1
         elif thisOp.name == 'MULTI':
-            i = 10
+            tempReg =  newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\nmulti " + tempReg + " " + thisOp.op1
+
 
         # IR multf op1 op2 result (float multiply)
         # Tiny mulr opmrl reg (real/float mult), reg = reg *op1
         elif thisOp.name == 'MULTF':
-            i = 10
+            tempReg = newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nmulr " + tempReg + " " + thisOp.op1
 
         # IR divi op1 op2 result (integer divide)
         # Tiny divi opmrl reg (int div), reg = reg / op1
         elif thisOp.name == 'DIVI':
-            i = 10
+            tempReg =  newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\ndivi " + tempReg + " " + thisOp.op1
+
 
         # IR divf op1 op2 result (float divide) Result = op1/op2
         # Tiny divr opmrl reg (real/float div) reg = reg / op1
         elif thisOp.name == 'DIVF':
-            i = 10
+            tempReg =  newRegs()
+            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\ndivr " + tempReg + " " + thisOp.op1
+
 
         # IR storei op1 result (integer store, store op1 to result)
         # Tiny move opmrl opmr (only one operand can be a memory id
         #     or stack variable
         elif thisOp.name == 'STOREI':
-            i = 10
+
+            assembled += "\nmove " + thisOp.op1 + " " + thisOp.result
 
         # IR storef op1 result (FP Store)
         # Tiny move opmrl opmr (only one operand can be a memory id
         #     or stack variable
         elif thisOp.name == 'STOREF':
-            i = 10
+            assembled += "\nmove " + thisOp.op1 + " " + thisOp.result
 
         # IR gt op1 op2 label (if op1 > op2 goto label)
-        # Tiny
+        # Tiny jgt target; jump if (op1 of the preceeding cmp was)
+        # greater (than op2)
         elif thisOp.name == 'GT':
-            i = 10
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+                "\njgt" + thisOp.label + thisOp.string
 
+        # IR ge op1 op2 LABEL (If OP1 >= OP2 Goto LABEL)
+        # Tiny jge target             ; jump if greater of equal
         elif thisOp.name == 'GE':
-            i = 10
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+                "\njge" + thisOp.label + thisOp.string
+
+        # IR lt op1 op2 LABEL (If OP1 <OP2 Goto LABEL)
+        # Tiny jlt target             ; jump if less than
         elif thisOp.name == 'LT':
-            i = 10
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+                "\njlt" + thisOp.label + thisOp.string
 
+        # IR le op1 op2 LABEL (If OP1 <= OP2 Goto LABEL
+        # Tiny jle target             ; jump if less or equal
         elif thisOp.name == 'LE':
-            i = 10
-        elif thisOp.name == 'NE':
-            i = 10
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+                "\njle" + thisOp.label + thisOp.string
 
+        # IR ne op1 op2 LABEL (If OP1 != OP2 Goto LABEL
+        # Tiny jne target   ; jump if not equal
+        elif thisOp.name == 'NE':
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+                "\njne" + thisOp.label + thisOp.string
+
+        # IR eq op1 op2 LABEL (If OP1 = OP2 Goto LABEL
+        # Tiny jeq target             ; jump if equal
         elif thisOp.name == 'EQ':
-            i = 10
+            assembled += "\ncmpi " + thisOp.op1 + " " + thisOp.op2 +\
+            "\njeq " + thisOp.label + thisOp.string
 
         # IR jump label (direct jump)
         # Tiny jmp target (unconditional jump)
         elif thisOp.name == 'JUMP':
-            i = 10
+            assembled += "\njmp " + thisOp.label + thisOp.string
 
         # IR label string (set a string label)
         # Tiny label target (a jump target)
         elif thisOp.name == 'LABEL':
-            i = 10
+            assembled += "\nlabel " + thisOp.label + thisOp.string
 
         # IR readi result
         # Tiny sys readi opmr (a system call for reading
         #    an integer from input)
         elif thisOp.name == 'READI':
-            i = 10
+            assembled += "\nsys readi " + thisOp.result
+
 
         # IR readf result
         # Tiny sys readr opmr (system call for reading a real value)
         elif thisOp.name == 'READF':
-            i = 10
+            assembled += "\nsys readr " + thisOp.result
 
         # IR writei result
         # Tiny sys writei opmr (system call for outputting an integer)
         elif thisOp.name == 'WRITEI':
-            i = 10
+            assembled += "\nsys writei " + thisOp.result
 
         # IR writef result
         # Tiny sys writer opmr (system call for outputting a real)
         elif thisOp.name == 'WRITEF':
-            i = 10
+            assembled += "\nsys writer " + thisOp.result
 
-        elif thisOp.name == 'STRINGY':
-            i = 0
+        # elif thisOp.name == 'STRINGY':
+        #    i = 0
 
+        elif thisOp.name == 'WRITES':
+
+            if thisOp.result:
+
+                    if thisOp.result not in myStrs:
+                        # tempReg2 = newRegs()
+                        myStrs[thisOp.result] = thisOp.string
+
+            assembled += "\nsys writes " + thisOp.result
         # IR writes result
         # Tiny sys writes sid (system call for outputting a string constant
 
@@ -267,11 +344,11 @@ def convert():
     varString = ""
 
     for s in myStrs:
-        assembled = "str " +s.name + " " + s.value + assembled
+        assembled = "\nstr " + s + " " + myStrs[s] + " " + assembled
 
 
     for v in myVars:
-        assembled = "var " + v + assembled
+        assembled = "\nvar " + v + " " + assembled
 
     assembled += "\nsys halt"
     return assembled
@@ -568,7 +645,7 @@ def p_basic_write_stmt(p):
         thissym = curnode.symbols.pop()
         if thissym.type == 'STRING':
             writestr = '\n;WRITES ' + thissym.name + writestr
-            minilist = [OpNode('WRITES', '', '', thissym.name, '', '')] + minilist
+            minilist = [OpNode('WRITES', '', '', thissym.name, '', thissym.value)] + minilist
         else:
             writestr = '\n;WRITE' + optype + ' ' + thissym.name + writestr
             minilist = [OpNode('WRITE' + optype, '', '', thissym.name, '', '')] + minilist
@@ -945,59 +1022,47 @@ def printinfo(node):
 #filename = sys.argv[1]
 #f = open(filename,"r")
 #data = f.read()
-data = '''PROGRAM expr
+data = '''PROGRAM test
 BEGIN
 
-	INT a,b,c,d;
-	FLOAT x,y,z,t;
-	STRING newline := "\n";
+	INT count,enough;
+	FLOAT newapprox,approx,num,tolerance,diff;
 
 	FUNCTION VOID main()
 	BEGIN
-		a := 1;
-		b := 2;
-		c := 10;
-		d := 20;
+		tolerance := 0.0001;
+		num	:= 7.0;
 
-		WRITE (a, newline);
-		WRITE (b, newline);
-		WRITE (c, newline);
-		WRITE (d, newline);
-		a := a + b;
-		WRITE (a, newline);
-		b := a * c;
-		WRITE (b, newline);
-		c := 0 - a + b;
-		WRITE (c, newline);
-		d := 0 - d;
-		WRITE (d, newline);
-		a := (a+b)*(d+c)-(a+b+c+d)/a;
-		WRITE (a, newline);
+		approx	:= num;
+		count 	:= 0;
+		diff 	:= 0.0;
+		enough 	:= 0;
 
-		a := a + 10;
-		WRITE (a, newline);
-		b := b + a + 10;
-		WRITE (b, newline);
-		c := 0 - 10;
-		WRITE (c, newline);
-		x := 1.0;
-		y := 2.0;
-		z := 3.14159;
-		WRITE (x, newline);
-		WRITE (z, newline);
-		WRITE (y, newline);
-		x := z/2.0;
-		y := z/y;
-		WRITE (x, newline);
-		WRITE (y, newline);
-		t := (x+y+z)/z;
-		WRITE (t, newline);
-		t := t*t;
-		WRITE (t, newline);
-		t := (t+z+t+t/2.0+z/4.0+z/5.0+z/6.0+z/7.0);
-		WRITE (t, newline);
+		WHILE(enough != 1)
+
+			count := count + 1;
+			newapprox := 0.5*(approx + num/approx);
+
+			diff := approx - newapprox;
+			IF (diff > 0.0)
+				IF (diff < tolerance)
+					enough := 1;
+				ENDIF
+			ELSE
+				IF (diff > (0.0 - tolerance))
+					enough := 1;
+				ENDIF
+			ENDIF
+
+			approx 	:= newapprox;
+
+		ENDWHILE
+
+		WRITE(approx);
+		WRITE(count);
 	END
 END
+
 
 '''
 
@@ -1012,10 +1077,10 @@ treeTraversal(root)
 printstr = printstr.rstrip()
 #print(printstr)
 
-
+# Print IR representation stuff
+print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
 
 print(convert())
 
-# Print IR representation stuff
-print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
+
 
