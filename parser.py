@@ -109,7 +109,7 @@ def convert():
         if thisOp.op1:
             i=10
 
-    assembled = "fuck this"
+    assembled = ""
 
     # new temporary numbers for Tiny ASS
 
@@ -178,75 +178,52 @@ def convert():
         # IR addi Op1 Op2 Result (int add)
         # Tiny addi opmrl reg, (integer addition), reg = reg + op1
         if thisOp.name == 'ADDI':
-
-            # if thisOp.op1[0] == '$':
-            #    if thisOp.op1 == '' not in varDict:
-            #        tempReg = newRegs()
-            #        varDict[thisOp.op1] = tempReg
-            # elif thisOp.op1
-            # elif thisOp.op1 not in myVars:
-            #    myVars += thisOp.op1
-            #
-            #
-            # if thisOp.op2[0] == '$':
-            #    if thisOp.op2 not in varDict:
-            #        tempReg = thisOp.op2
-
-
-
-            tempReg =  newRegs()
-            assembled += "\nmove " + thisOp.op1 + " " + tempReg +"\naddi " + tempReg + " " + thisOp.op2
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg +"\naddi " + thisOp.op2 + " " + tempReg
 
         # IR addf Op1 Op2 Result (floating point add)
         # Tiny addr opmrl reg (real/float add), reg = reg + op1
         elif thisOp.name == 'ADDF':
-            tempReg = newRegs()
-            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\naddf " + tempReg + " " + thisOp.op2
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\naddr " + thisOp.op2 + " " + tempReg
 
         # IR subi Op1 Op2  Result (int sub)
         # Tiny subi opmrl reg (int sub), reg = reg - op1
         elif thisOp.name == 'SUBI':
-            tempReg = newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubi " + tempReg + " " + thisOp.op1
+            #assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubi " + thisOp.op1 + " " + tempReg
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nsubi " + thisOp.op2 + " " + tempReg
 
         # IR subf Op1 Op2 Result (float subtract) Result = op1/op2
         # Tiny subr opmrl reg (real/float sub), reg = reg - op1
         elif thisOp.name == 'SUBF':
-            tempReg = newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubr " + tempReg + " " + thisOp.op1
-
+            #assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubr " + thisOp.op1 + " " + tempReg
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nsubf " + thisOp.op2 + " " + tempReg
         # IR multi op1 op2 result (int multiply)
         # Tiny muli opmrl reg (int mult), reg = reg * op1
         elif thisOp.name == 'MULTI':
-            tempReg =  newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\nmulti " + tempReg + " " + thisOp.op1
-
+            #assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\nmuli " + tempReg + " " + thisOp.op1
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nmuli " + thisOp.op2 + " " + tempReg
 
         # IR multf op1 op2 result (float multiply)
         # Tiny mulr opmrl reg (real/float mult), reg = reg *op1
         elif thisOp.name == 'MULTF':
-            tempReg = newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nmulr " + tempReg + " " + thisOp.op1
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nmulr " + thisOp.op2 + " " + tempReg
 
         # IR divi op1 op2 result (integer divide)
         # Tiny divi opmrl reg (int div), reg = reg / op1
         elif thisOp.name == 'DIVI':
-            tempReg =  newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\ndivi " + tempReg + " " + thisOp.op1
+            #assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\ndivi " + tempReg + " " + thisOp.op1
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\ndivi " + thisOp.op2 + " " + tempReg
 
 
         # IR divf op1 op2 result (float divide) Result = op1/op2
         # Tiny divr opmrl reg (real/float div) reg = reg / op1
         elif thisOp.name == 'DIVF':
-            tempReg =  newRegs()
-            assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\ndivr " + tempReg + " " + thisOp.op1
+            assembled += "\nmove " + thisOp.op1 + " " + tempReg +"\ndivr " + thisOp.op2 + " " + tempReg
 
 
         # IR storei op1 result (integer store, store op1 to result)
         # Tiny move opmrl opmr (only one operand can be a memory id
         #     or stack variable
         elif thisOp.name == 'STOREI':
-
             assembled += "\nmove " + thisOp.op1 + " " + thisOp.result
 
         # IR storef op1 result (FP Store)
@@ -300,7 +277,8 @@ def convert():
         # IR label string (set a string label)
         # Tiny label target (a jump target)
         elif thisOp.name == 'LABEL':
-            assembled += "\nlabel " + thisOp.label + thisOp.string
+            if thisOp.label:
+                assembled += "\nlabel " + thisOp.label
 
         # IR readi result
         # Tiny sys readi opmr (a system call for reading
@@ -324,8 +302,11 @@ def convert():
         elif thisOp.name == 'WRITEF':
             assembled += "\nsys writer " + thisOp.result
 
-        # elif thisOp.name == 'STRINGY':
-        #    i = 0
+        elif thisOp.name == 'STRINGY':
+            if thisOp.string == '"\n"':
+                assembled += repr(' "\n"').replace("'",'')
+            else:
+                assembled += '\n' + (thisOp.label + repr(thisOp.string).replace("'", '').replace('"', '')).replace("\n", '')
 
         elif thisOp.name == 'WRITES':
 
@@ -343,12 +324,6 @@ def convert():
     #
     varString = ""
 
-    for s in myStrs:
-        assembled = "\nstr " + s + " " + myStrs[s] + " " + assembled
-
-
-    for v in myVars:
-        assembled = "\nvar " + v + " " + assembled
 
     assembled += "\nsys halt"
     return assembled
@@ -367,6 +342,12 @@ def p_program_program(p):
 def p_program_idea(p):
     'id : IDENTIFIER'
     global idnames
+    global opList
+    global functionEntered
+
+    if not functionEntered :
+        opList += [OpNode('STRINGY', '', '', '', 'var ', p[1])]
+
     idnames.append(p.slice[1].value)
     p[0]=p[1]
     pass
@@ -387,6 +368,8 @@ def p_program_decl(p):
 # Global String
 def p_gstring_string_decl(p):
     '''string_decl : STRING id ASSIGN str SEMICOLON'''
+    global opList
+    opList[-2].label = 'str '
     pass
 
 
@@ -572,6 +555,11 @@ def p_fdecl_func_body(p):
 def p_statements_stmt_list(p):
     '''stmt_list : stmt stmt_list
     | empty'''
+    if len(p.slice) == 3:
+        if p[1]:
+            p[0] = p[1]
+        else:
+            p[0] = p[2]
     pass
 
 
@@ -579,6 +567,7 @@ def p_statements_stmt(p):
     '''stmt : base_stmt
     | if_stmt
     | while_stmt'''
+    p[0] = p[1]
     pass
 
 
@@ -616,12 +605,20 @@ def p_basic_read_stmt(p):
     global opList
 
     i = 0
+    writestr = ''
+    minilist = []
     while i < reversPrevSize:
         i += 1
         # Consume symbol from curnode
         thissym = curnode.symbols.pop()
-        irString +='\n;READ' + optype + ' ' + thissym.name
-        opList += [OpNode('READ' + optype, '', '', thissym.name, '', '')]
+        if thissym.type == 'STRING':
+            writestr = '\n;READS ' + thissym.name + writestr
+            minilist = [OpNode('READS', '', '', thissym.name, '', thissym.value)] + minilist
+        else:
+            writestr = '\n;READ' + optype + ' ' + thissym.name + writestr
+            minilist = [OpNode('READ' + optype, '', '', thissym.name, '', '')] + minilist
+    irString += writestr
+    opList += minilist
     pass
 
 
@@ -632,7 +629,6 @@ def p_basic_write_stmt(p):
     global curnode
     global reversPrevSize
     global irString
-    global idnames
     global optype
     global opList
 
@@ -838,9 +834,9 @@ def p_complex_else_part(p):
         global irString
 
         # Add label to output string
-        irString += '\n;LABEL ' + 'label' + str(irlabel)
-        opList += [OpNode('LABEL', '', '', '', 'label' + str(irlabel), '')]
-        p[0] = 'label' + str(irlabel)
+        irString += '\n;JUMP ' + 'label' + str(irlabel)
+        opList += [OpNode('JUMP', '', '', '', 'label' + str(irlabel), '')]
+        p[0] = 'JUMP' + str(irlabel)
         irlabel += 1
 
         # Increment block count
@@ -913,17 +909,17 @@ def p_complex_compop(p):
     # Make comparison
     operation = ""
     if (p.slice[1].type == 'EQUAL'):
-        operation = "EQ" + optype
+        operation = ";EQ" + optype
     elif(p.slice[1].type == 'NOTEQUAL'):
-        operation = "NE" + optype
+        operation = ";NE" + optype
     elif (p.slice[1].type == 'GREATER'):
-        operation = "GT" + optype
+        operation = ";GT" + optype
     elif (p.slice[1].type == 'GREATEQUAL'):
-        operation = "GE" + optype
+        operation = ";GE" + optype
     elif (p.slice[1].type == 'LESS'):
-        operation = "LT" + optype
+        operation = ";LT" + optype
     elif (p.slice[1].type == 'LESSEQUAL'):
-        operation = "LE" + optype
+        operation = ";LE" + optype
 
     p[0] = operation
     pass
@@ -1022,47 +1018,27 @@ def printinfo(node):
 #filename = sys.argv[1]
 #f = open(filename,"r")
 #data = f.read()
-data = '''PROGRAM test
+data = '''PROGRAM p
 BEGIN
 
-	INT count,enough;
-	FLOAT newapprox,approx,num,tolerance,diff;
+	INT a,b,c;
 
 	FUNCTION VOID main()
 	BEGIN
-		tolerance := 0.0001;
-		num	:= 7.0;
+		a := 20;
+		b := 30;
+		c := 40;
 
-		approx	:= num;
-		count 	:= 0;
-		diff 	:= 0.0;
-		enough 	:= 0;
+		c := c + a*b + (a*b+c)/a + 20;
+		b := b*b + a;
+		a := (b*a)/a;
 
-		WHILE(enough != 1)
+		WRITE (c);
+		WRITE (b);
+		WRITE (a);
 
-			count := count + 1;
-			newapprox := 0.5*(approx + num/approx);
-
-			diff := approx - newapprox;
-			IF (diff > 0.0)
-				IF (diff < tolerance)
-					enough := 1;
-				ENDIF
-			ELSE
-				IF (diff > (0.0 - tolerance))
-					enough := 1;
-				ENDIF
-			ENDIF
-
-			approx 	:= newapprox;
-
-		ENDWHILE
-
-		WRITE(approx);
-		WRITE(count);
 	END
 END
-
 
 '''
 
@@ -1078,7 +1054,7 @@ printstr = printstr.rstrip()
 #print(printstr)
 
 # Print IR representation stuff
-print("\n\n" + irString.replace('  ', ' ') + '\n;RET\n;tiny code')
+print(irString.replace('  ', ' ') + '\n;RET\n;tiny code')
 
 print(convert())
 
