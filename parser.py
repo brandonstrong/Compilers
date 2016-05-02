@@ -1,3 +1,19 @@
+##########################################
+#  CSCI-468 Compiler
+#  Group 0 - Brandon Strong, Sawyer Payne,
+#  and Matthew Gannon
+#
+#  A compiler for the little language.
+#  This current program still has problems
+#  dealing with IF and While.  The
+#  superStack was being built to deal with
+#  holding the labels and jump info but
+#  was not integrated due to time
+#  constraints.
+#
+##########################################
+
+
 import ply.yacc as yacc
 from scanner import tokens
 from collections import deque
@@ -81,72 +97,54 @@ optype = ''
 opList = []
 registerNums = 0
 
+
+# Keep track of the new registers created
 def newRegs():
     global registerNums
-
     registerName ="r" + str(registerNums)
     registerNums = registerNums + 1
-
     return registerName
 
 
-
+# Convert the IR code into tiny code
 def convert():
     global irString
-    #assemble = [irString.replace(";", "") for clean in irString.split('\n') if irString.replace()]
-    # myOp = OpNode()
-
     # Vars and Strs must precede all codes and labels in tiny assembly
     # The only ops on string constants is sys writes sid
     # strings can include \n for end-of-line
-
-    myVars = []
+    global opList
     myStrs = {}
-    varDict ={}
     tempDict = {}
 
-    def checkVars():
-        if thisOp.op1:
-            i=10
-
+    # new string for Tiny Assembly language
     assembled = ""
 
-    # new temporary numbers for Tiny ASS
-
-
-    global opList
-# need to change all temporary variables into registers.
-
-
-# notation used for the operands:
-# id      stands for the name of a memory location
-# sid     stands for the name of a string constant
-#         stands for an integer number
-# target  stands for the name of a jump target
-# $offset stands for a stack variable at address fp+offset
-# reg     stands for a  register, named r0,r1,r2, or r3, case insensitive
-# opmrl   stands for a memory id, stack variable, register or a number (literal),
-#         the format for real is digit*[.digit*][E[+|-]digit*]
-# opmr    stands for a memory id, stack variable, or a register
-
+    # need to change all temporary variables into registers.
+    # notation used for the operands:
+    # id      stands for the name of a memory location
+    # sid     stands for the name of a string constant
+    #         stands for an integer number
+    # target  stands for the name of a jump target
+    # $offset stands for a stack variable at address fp+offset
+    # reg     stands for a  register, named r0,r1,r2, or r3, case insensitive
+    # opmrl   stands for a memory id, stack variable, register or a number (literal),
+    #         the format for real is digit*[.digit*][E[+|-]digit*]
+    # opmr    stands for a memory id, stack variable, or a register
 
     for thisOp in opList:
 
         # check for variables and add to myVars
-
         # check for strings and add to my strings
-
         # check for register and if new one is needed
 
         tempReg = ""
-        tempReg2 = ""
         thisOp.op1 = thisOp.op1.strip()
         thisOp.op2 = thisOp.op2.strip()
         thisOp.result = thisOp.result.strip()
 
+        # replace IR temporary registers
         if thisOp.op1:
             if thisOp.op1[0] == '$':
-
                 if thisOp.op1 not in tempDict:
                     tempReg = newRegs()
                     tempDict[thisOp.op1] = tempReg
@@ -154,20 +152,19 @@ def convert():
                 else:
                     thisOp.op1 = tempDict[thisOp.op1]
 
+        # replace IR temporary registers
         if thisOp.op2:
-
             if thisOp.op2[0] == '$':
-
                 if thisOp.op2 not in tempDict:
                     tempReg = newRegs()
                     tempDict[thisOp.op2] = tempReg
                     thisOp.op2 = tempReg
                 else:
                     thisOp.op2 = tempDict[thisOp.op2]
+
+        # replace IR temporary registers
         if thisOp.result:
-
             if thisOp.result[0] == '$':
-
                 if thisOp.result not in tempDict:
                     tempReg = newRegs()
                     tempDict[thisOp.result] = tempReg
@@ -188,18 +185,16 @@ def convert():
         # IR subi Op1 Op2  Result (int sub)
         # Tiny subi opmrl reg (int sub), reg = reg - op1
         elif thisOp.name == 'SUBI':
-            #assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubi " + thisOp.op1 + " " + tempReg
             assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nsubi " + thisOp.op2 + " " + tempReg
 
         # IR subf Op1 Op2 Result (float subtract) Result = op1/op2
         # Tiny subr opmrl reg (real/float sub), reg = reg - op1
         elif thisOp.name == 'SUBF':
-            #assembled += "\nmove " + thisOp.op2 + " " + tempReg + "\nsubr " + thisOp.op1 + " " + tempReg
             assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nsubf " + thisOp.op2 + " " + tempReg
+
         # IR multi op1 op2 result (int multiply)
         # Tiny muli opmrl reg (int mult), reg = reg * op1
         elif thisOp.name == 'MULTI':
-            #assembled += "\nmove " + thisOp.op2 + " " + tempReg +"\nmuli " + tempReg + " " + thisOp.op1
             assembled += "\nmove " + thisOp.op1 + " " + tempReg + "\nmuli " + thisOp.op2 + " " + tempReg
 
         # IR multf op1 op2 result (float multiply)
@@ -308,28 +303,20 @@ def convert():
             else:
                 assembled += '\n' + (thisOp.label + repr(thisOp.string).replace("'", '').replace('"', '')).replace("\n", '')
 
+        # IR writes result
+        # Tiny sys writes sid (system call for outputting a string constant
         elif thisOp.name == 'WRITES':
-
             if thisOp.result:
-
                     if thisOp.result not in myStrs:
                         # tempReg2 = newRegs()
                         myStrs[thisOp.result] = thisOp.string
-
             assembled += "\nsys writes " + thisOp.result
-        # IR writes result
-        # Tiny sys writes sid (system call for outputting a string constant
 
-    # sys halt (system call to end the execution)
-    #
     varString = ""
 
-
+    # sys halt (system call to end the execution)
     assembled += "\nsys halt"
     return assembled
-
-
-
 
 
 # Program
@@ -382,8 +369,8 @@ def p_gstring_str(p):
     global optype
     global functionEntered
     global opList
-
     optype = 'S'
+
     # Create new symbol
     thissymbol = Symbol()
     thissymbol.name = idnames.pop()
@@ -395,7 +382,6 @@ def p_gstring_str(p):
 
     if not functionEntered:
         opList += [OpNode('STRINGY', '', '', '', '', p[1])]
-
     pass
 
 
@@ -1014,37 +1000,41 @@ def printinfo(node):
         printstr = printstr + str + "\n"
     printstr = printstr + "\n"
 
+
+# SuperStack was being built to handle the If/While/ends
+# It would have push/popped labels for jumps and
+# integer or float type that would be needed.
+def superStack ():
+    def __init__ (self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def push(self, item):
+        self.items.append(item)
+
+    def pop(self):
+        return self.items.pop()
+
+    def peek(self):
+        return self.items[len(self.items)-1]
+
+    def size(self):
+        return len(self.items)
+
+
 # Get input
-#filename = sys.argv[1]
-#f = open(filename,"r")
-#data = f.read()
-data = '''PROGRAM p
-BEGIN
+filename = sys.argv[1]
+f = open(filename,"r")
+data = f.read()
 
-	INT a,b,c;
 
-	FUNCTION VOID main()
-	BEGIN
-		a := 20;
-		b := 30;
-		c := 40;
-
-		c := c + a*b + (a*b+c)/a + 20;
-		b := b*b + a;
-		a := (b*a)/a;
-
-		WRITE (c);
-		WRITE (b);
-		WRITE (a);
-
-	END
-END
-
-'''
 
 # Build parser and parse data
 parser = yacc.yacc()
 result = parser.parse(data)
+stack = superStack()
 
 # Traverse tree
 treeTraversal(root)
@@ -1054,8 +1044,6 @@ printstr = printstr.rstrip()
 #print(printstr)
 
 # Print IR representation stuff
-print(irString.replace('  ', ' ') + '\n;RET\n;tiny code')
-
 print(convert())
 
 
